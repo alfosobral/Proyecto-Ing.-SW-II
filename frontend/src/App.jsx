@@ -8,8 +8,8 @@ export default function App() {
         display: "flex",
         justifyContent: "center",
         alignItems: "flex-start",
-        padding: "40px 0",
-        background: "#7bedffff" 
+        padding: "20px 0",
+        background: "#89f1ffff" 
       }}
     >
       <Register width={600}/>
