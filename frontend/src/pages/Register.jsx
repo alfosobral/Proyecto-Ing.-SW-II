@@ -2,9 +2,10 @@ import { useState, useMemo } from "react";
 
 const initial = { name: "", email: "", password: "", confirm: "", accept: false };
 
-export default function Register() {
+export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
   const [touched, setTouched] = useState({});
+  const [focused, setFocused] = useState(null);
 
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
@@ -36,9 +37,11 @@ export default function Register() {
       <div style={styles.field}>
         <label style={styles.label} htmlFor="name">Nombre</label>
         <input
-          id="name" name="name" value={form.name} onChange={onChange} onBlur={onBlur}
+          id="name" name="name" value={form.name} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("name")} onBlurCapture={() => setFocused(null)}
           placeholder="Tu nombre"
-          style={inputStyle(touched.name && errors.name)}
+          style={inputStyle(touched.name && errors.name, focused === "name")}
         />
         {touched.name && errors.name && <p style={styles.error}>{errors.name}</p>}
       </div>
@@ -47,9 +50,11 @@ export default function Register() {
       <div style={styles.field}>
         <label style={styles.label} htmlFor="email">Email</label>
         <input
-          id="email" name="email" value={form.email} onChange={onChange} onBlur={onBlur}
+          id="email" name="email" value={form.email} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
           placeholder="tu@email.com"
-          style={inputStyle(touched.email && errors.email)}
+          style={inputStyle(touched.email && errors.email, focused === "email")}
         />
         {touched.email && errors.email && <p style={styles.error}>{errors.email}</p>}
       </div>
@@ -59,9 +64,11 @@ export default function Register() {
         <label style={styles.label} htmlFor="password">Contraseña</label>
         <input
           id="password" name="password" type="password"
-          value={form.password} onChange={onChange} onBlur={onBlur}
+          value={form.password} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("password")} onBlurCapture={() => setFocused(null)}
           placeholder="••••••••"
-          style={inputStyle(touched.password && errors.password)}
+          style={inputStyle(touched.password && errors.password, focused === "password")}
         />
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
@@ -75,9 +82,11 @@ export default function Register() {
         <label style={styles.label} htmlFor="confirm">Confirmar contraseña</label>
         <input
           id="confirm" name="confirm" type="password"
-          value={form.confirm} onChange={onChange} onBlur={onBlur}
+          value={form.confirm} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("confirm")} onBlurCapture={() => setFocused(null)}
           placeholder="Repite la contraseña"
-          style={inputStyle(touched.confirm && errors.confirm)}
+          style={inputStyle(touched.confirm && errors.confirm, focused === "confirm")}
         />
         {touched.confirm && errors.confirm && <p style={styles.error}>{errors.confirm}</p>}
       </div>
@@ -141,13 +150,21 @@ const styles = {
   meterText: { color: "#475569", fontSize: 12, display: "block", marginTop: 6 }
 };
 
-function inputStyle(isError) {
+function inputStyle(isError, isFocused) {
   return {
-    width: "100%", padding: "10px 12px", borderRadius: 10,
-    border: `1px solid ${isError ? "#ef4444" : "#cbd5e1"}`,
-    outline: "none", fontSize: 14
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 10,
+    border: `1px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
+    outline: "none",
+    fontSize: 14,
+    transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
+    transform: isFocused ? "scale(1.02)" : "scale(1)",
+    boxShadow: isFocused ? "0 0 0 3px rgba(37,99,235,.15)" : "none",
+    background: "white",
   };
 }
+
 
 function buttonStyle(disabled) {
   return {
