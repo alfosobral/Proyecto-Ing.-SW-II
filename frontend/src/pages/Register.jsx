@@ -96,7 +96,6 @@ export default function Register() {
   );
 }
 
-/* -------------------- Validación -------------------- */
 function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
