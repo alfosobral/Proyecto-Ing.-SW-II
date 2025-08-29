@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 
-const initial = { name: "", email: "", password: "", confirm: "", accept: false };
+const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
@@ -31,7 +31,7 @@ export default function Register({ width = 420 }) {
 
   return (
     <form onSubmit={onSubmit} style={styles.card}>
-      <h1 style={styles.title}>Crear cuenta</h1>
+      <h1 style={styles.title}>Crea tu cuenta</h1>
 
       {/* Nombre */}
       <div style={styles.field}>
@@ -44,6 +44,32 @@ export default function Register({ width = 420 }) {
           style={inputStyle(touched.name && errors.name, focused === "name")}
         />
         {touched.name && errors.name && <p style={styles.error}>{errors.name}</p>}
+      </div>
+
+      {/* Apellido */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="secondName">Apellido</label>
+        <input
+          id="secondName" name="secondName" value={form.secondName} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("secondName")} onBlurCapture={() => setFocused(null)}
+          placeholder="Tu apellido"
+          style={inputStyle(touched.secondName && errors.secondName, focused === "secondName")}
+        />
+        {touched.secondName && errors.secondName && <p style={styles.error}>{errors.secondName}</p>}
+      </div>
+
+      {/* Documento */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="document">Documento</label>
+        <input
+          id="document" name="document" value={form.document} 
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
+          placeholder="Documento (CI)"
+          style={inputStyle(touched.document && errors.document, focused === "document")}
+        />
+        {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
       </div>
 
       {/* Email */}
@@ -108,6 +134,8 @@ export default function Register({ width = 420 }) {
 function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
+  if (!f.secondName.trim()) errs.secondName = "El apellido es obligatorio.";
+  if (!isValidDocument(f.document)) errs.document = "El documento es inválido (8 digit)."
   if (!isValidEmail(f.email)) errs.email = "Email inválido.";
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
   if (!/[A-Z]/.test(f.password)) errs.password ??= "Incluye al menos una mayúscula.";
@@ -118,6 +146,10 @@ function validate(f) {
 
 function isValidEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+function isValidDocument(s) {
+  return /^[0-9]{8}$/.test(s);
 }
 
 function passwordStrength(pw) {

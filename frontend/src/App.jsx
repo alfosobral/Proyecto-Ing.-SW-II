@@ -1,4 +1,5 @@
 import Register from "./pages/Register";
+import logo from "./assets/HurryHand.svg";
 
 export default function App() {
   return (
@@ -9,10 +10,10 @@ export default function App() {
         justifyContent: "center",
         alignItems: "flex-start",
         padding: "20px 0",
-        background: "#89f1ffff" 
+        background: "#222222ff" 
       }}
     >
-      <Register width={600}/>
+      <Register/>
     </div>
   );
 }
