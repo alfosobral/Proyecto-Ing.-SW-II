@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", accept: false };
 
@@ -6,6 +7,7 @@ export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
   const [touched, setTouched] = useState({});
   const [focused, setFocused] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
@@ -28,6 +30,10 @@ export default function Register({ width = 420 }) {
   }
 
   const strength = passwordStrength(form.password);
+
+   const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <form onSubmit={onSubmit} style={styles.card}>
@@ -89,13 +95,19 @@ export default function Register({ width = 420 }) {
       <div style={styles.field}>
         <label style={styles.label} htmlFor="password">Contraseña</label>
         <input
-          id="password" name="password" type="password"
+          id="password" name="password" type={showPassword ? "text" : "password"}
           value={form.password} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("password")} onBlurCapture={() => setFocused(null)}
           placeholder="••••••••"
           style={inputStyle(touched.password && errors.password, focused === "password")}
         />
+        <span
+          onClick={togglePassword}
+          style={styles.eyeIcon}
+        >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </span>
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
         </div>
@@ -169,7 +181,7 @@ const styles = {
     paddingBottom: 40,
     paddingLeft: 24,
     paddingRight: 48, 
-    borderRadius: 16, 
+    borderRadius: 16,
     boxShadow: "0 10px 30px rgba(0,0,0,.2)",
     fontFamily: "Montserrat"
   },
@@ -179,7 +191,8 @@ const styles = {
   error: { color: "#dc2626", fontSize: 13, marginTop: 6 },
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
-  meterText: { color: "#475569", fontSize: 12, display: "block", marginTop: 6 }
+  meterText: { color: "#475569", fontSize: 12, display: "block", marginTop: 6 },
+  eyeIcon: {position: "realtive", marginTop: 6, color: "#555", fontSize: "18px"}
 };
 
 function inputStyle(isError, isFocused) {
@@ -187,7 +200,7 @@ function inputStyle(isError, isFocused) {
     width: "100%",
     padding: "10px 12px",
     borderRadius: 10,
-    border: `1px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
+    border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
     outline: "none",
     fontSize: 14,
     transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",

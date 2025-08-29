@@ -1,4 +1,3 @@
-/* ==== RESET BÁSICO ==== */
 *,
 *::before,
 *::after {
@@ -19,7 +18,7 @@ html, body {
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #0f172a; /* 👈 color de fondo global */
+  background-color: #0f172a;
   color: white;
   line-height: 1.5;
   overflow-x: hidden;
