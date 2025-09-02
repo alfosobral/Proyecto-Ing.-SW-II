@@ -10,10 +10,10 @@ export default function App() {
         justifyContent: "center",
         alignItems: "flex-start",
         padding: "20px 0",
-        background: "#222222ff" 
+        background: "#8ddfffff" 
       }}
     >
-      <Register/>
+      <Register width={600}/>
     </div>
   );
 }

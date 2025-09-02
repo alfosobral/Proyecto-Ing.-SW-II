@@ -102,12 +102,12 @@ export default function Register({ width = 420 }) {
           placeholder="••••••••"
           style={inputStyle(touched.password && errors.password, focused === "password")}
         />
-        <span
+        <div
           onClick={togglePassword}
           style={styles.eyeIcon}
         >
           {showPassword ? <FaEyeSlash /> : <FaEye />}
-        </span>
+        </div>
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
         </div>
@@ -192,7 +192,7 @@ const styles = {
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
   meterText: { color: "#475569", fontSize: 12, display: "block", marginTop: 6 },
-  eyeIcon: {position: "realtive", marginTop: 6, color: "#555", fontSize: "18px"}
+  eyeIcon: {position: "realtive", marginTop: 6, color: "#b6b6b6ff", fontSize: "18px"}
 };
 
 function inputStyle(isError, isFocused) {
@@ -205,11 +205,10 @@ function inputStyle(isError, isFocused) {
     fontSize: 14,
     transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
     transform: isFocused ? "scale(1.02)" : "scale(1)",
-    boxShadow: isFocused ? "0 0 0 3px rgba(37,99,235,.15)" : "none",
+    boxShadow: isFocused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
     background: "white",
   };
 }
-
 
 function buttonStyle(disabled) {
   return {
