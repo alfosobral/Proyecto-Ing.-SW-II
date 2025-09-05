@@ -50,55 +50,59 @@ export default function LogIn() {
 	    navigate("/main_page");
 	}
 
-	return (
-		<div style={styles.page}>
-			<form onSubmit={onSubmit} style={styles.card}>
-				<img src={logo} alt="Logo Hurry Hand" width={120} style={{ marginBottom: 10 }} />
-				<h1 style={styles.title}>Iniciar sesión</h1>
-				<div style={styles.field}>
-					<label style={styles.label} htmlFor="email">Email</label>
-					<input
-						id="email"
-						name="email"
-						value={form.email}
-						onChange={onChange}
-						onBlur={onBlur}
-						onFocus={() => setFocused("email")}
-						onBlurCapture={() => setFocused(null)}
-						style={inputStyle(touched.email && !form.email, focused === "email")}
-						placeholder="tu@email.com"
-					/>
-					{touched.email && !form.email && <p style={styles.error}>El email es obligatorio</p>}
-				</div>
-				<div style={styles.field}>
-					<label style={styles.label} htmlFor="password">Contraseña</label>
-					<div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+		return (
+			<div style={styles.page}>
+				<form onSubmit={onSubmit} style={styles.card}>
+					<img src={logo} alt="Logo Hurry Hand" width={120} style={{ marginBottom: 10 }} />
+					<h1 style={styles.title}>Iniciar sesión</h1>
+					<div style={styles.field}>
+						<label style={styles.label} htmlFor="email">Email</label>
 						<input
-							id="password"
-							name="password"
-							type={showPassword ? "text" : "password"}
-							value={form.password}
+							id="email"
+							name="email"
+							value={form.email}
 							onChange={onChange}
 							onBlur={onBlur}
-							onFocus={() => setFocused("password")}
+							onFocus={() => setFocused("email")}
 							onBlurCapture={() => setFocused(null)}
-							style={{ ...inputStyle(touched.password && !form.password, focused === "password"), paddingRight: 36 }}
-							placeholder="••••••••"
+							style={inputStyle(touched.email && !form.email, focused === "email")}
+							placeholder="tu@email.com"
 						/>
-						<span
-							onClick={() => setShowPassword(s => !s)}
-							style={{ position: "absolute", right: 10, top: 0, bottom: 0, display: "flex", alignItems: "center", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
-						>
-							{showPassword ? <FaEyeSlash /> : <FaEye />}
-						</span>
+						{touched.email && !form.email && <p style={styles.error}>El email es obligatorio</p>}
 					</div>
-					{touched.password && !form.password && <p style={styles.error}>La contraseña es obligatoria</p>}
-				</div>
-				{error && <p style={styles.error}>{error}</p>}
-				<button type="submit" style={styles.button}>Ingresar</button>
-			</form>
-		</div>
-	);
+					<div style={styles.field}>
+						<label style={styles.label} htmlFor="password">Contraseña</label>
+						<div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+							<input
+								id="password"
+								name="password"
+								type={showPassword ? "text" : "password"}
+								value={form.password}
+								onChange={onChange}
+								onBlur={onBlur}
+								onFocus={() => setFocused("password")}
+								onBlurCapture={() => setFocused(null)}
+								style={{ ...inputStyle(touched.password && !form.password, focused === "password"), paddingRight: 36 }}
+								placeholder="••••••••"
+							/>
+							<span
+								onClick={() => setShowPassword(s => !s)}
+								style={{ position: "absolute", right: 10, top: 0, bottom: 0, display: "flex", alignItems: "center", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
+							>
+								{showPassword ? <FaEyeSlash /> : <FaEye />}
+							</span>
+						</div>
+						{touched.password && !form.password && <p style={styles.error}>La contraseña es obligatoria</p>}
+					</div>
+							{error && <p style={styles.error}>{error}</p>}
+							<div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#bababaff" }}>
+								¿Aún no tienes una cuenta?{' '}
+								<a href="/register" style={{ color: "#30a5e8", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
+							</div>
+							<button type="submit" style={styles.button}>Ingresar</button>
+				</form>
+			</div>
+		);
 }
 
     const styles = {
