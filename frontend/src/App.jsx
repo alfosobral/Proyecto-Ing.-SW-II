@@ -1,16 +1,19 @@
 import Register from "./pages/Register";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LogIn from "./pages/LogIn";
 import MainPage from "./pages/MainPage"
 
-export default function App() {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Register />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LogIn />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/main_page" element={<MainPage />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
+export default App;

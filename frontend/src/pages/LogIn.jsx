@@ -9,11 +9,33 @@ export default function LogIn() {
 	const [error, setError] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const navigate = useNavigate();
+	const [touched, setTouched] = useState({});
+	const [focused, setFocused] = useState(null);
+
+	function inputStyle(isError, isFocused) {
+		return {
+			width: "450px", 
+			maxWidth: "100%",
+			padding: "10px 12px",
+			borderRadius: 10,
+			border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
+			outline: "none",
+			fontSize: 14,
+			transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
+			transform: isFocused ? "scale(1.02)" : "scale(1)",
+			boxShadow: isFocused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
+			background: "white",
+		};
+	}
 
 	function onChange(e) {
 		const { name, value } = e.target;
 		setForm(f => ({ ...f, [name]: value }));
 	}
+
+	function onBlur(e) {
+	    setTouched(t => ({ ...t, [e.target.name]: true }));
+  	}
 
 	function onSubmit(e) {
 		e.preventDefault();
@@ -40,29 +62,37 @@ export default function LogIn() {
 						name="email"
 						value={form.email}
 						onChange={onChange}
-						style={styles.input}
+						onBlur={onBlur}
+						onFocus={() => setFocused("email")}
+						onBlurCapture={() => setFocused(null)}
+						style={inputStyle(touched.email && !form.email, focused === "email")}
 						placeholder="tu@email.com"
 					/>
+					{touched.email && !form.email && <p style={styles.error}>El email es obligatorio</p>}
 				</div>
 				<div style={styles.field}>
-								<label style={styles.label} htmlFor="password">Contraseña</label>
-								<div style={{ position: "relative" }}>
-									<input
-										id="password"
-										name="password"
-										type={showPassword ? "text" : "password"}
-										value={form.password}
-										onChange={onChange}
-										style={{ ...styles.input, paddingRight: 36 }}
-										placeholder="••••••••"
-									/>
-									<span
-										onClick={() => setShowPassword(s => !s)}
-										style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
-									>
-										{showPassword ? <FaEyeSlash /> : <FaEye />}
-									</span>
-								</div>
+					<label style={styles.label} htmlFor="password">Contraseña</label>
+					<div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+						<input
+							id="password"
+							name="password"
+							type={showPassword ? "text" : "password"}
+							value={form.password}
+							onChange={onChange}
+							onBlur={onBlur}
+							onFocus={() => setFocused("password")}
+							onBlurCapture={() => setFocused(null)}
+							style={{ ...inputStyle(touched.password && !form.password, focused === "password"), paddingRight: 36 }}
+							placeholder="••••••••"
+						/>
+						<span
+							onClick={() => setShowPassword(s => !s)}
+							style={{ position: "absolute", right: 10, top: 0, bottom: 0, display: "flex", alignItems: "center", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
+						>
+							{showPassword ? <FaEyeSlash /> : <FaEye />}
+						</span>
+					</div>
+					{touched.password && !form.password && <p style={styles.error}>La contraseña es obligatoria</p>}
 				</div>
 				{error && <p style={styles.error}>{error}</p>}
 				<button type="submit" style={styles.button}>Ingresar</button>

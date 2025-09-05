@@ -75,26 +75,34 @@ export default function Register({ width = 420 }) {
       {/* Documento */}
       <div style={styles.field}>
         <label style={styles.label} htmlFor="document">Documento</label>
-        <input
-          id="document" name="document" value={form.document} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
-          placeholder="Documento (CI)"
-          style={inputStyle(touched.document && errors.document, focused === "document")}
-        />
+          <input
+            id="document" name="document" value={form.document}
+            onChange={e => {
+              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 8);
+              setForm(f => ({ ...f, document: value }));
+            }}
+            onBlur={onBlur}
+            onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
+            placeholder="Cédula"
+            style={inputStyle(touched.document && errors.document, focused === "document")}
+          />
         {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
       </div>
 
       {/* Teléfono */}
       <div style={styles.field}>
         <label style={styles.label} htmlFor="phone">Teléfono</label>
-        <input
-          id="phone" name="phone" value={form.phone}
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
-          placeholder="Ej: 099123456"
-          style={inputStyle(touched.phone && errors.phone, focused === "phone")}
-        />
+          <input
+            id="phone" name="phone" value={form.phone}
+            onChange={e => {
+              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
+              setForm(f => ({ ...f, phone: value }));
+            }}
+            onBlur={onBlur}
+            onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
+            placeholder="Teléfono"
+            style={inputStyle(touched.phone && errors.phone, focused === "phone")}
+          />
         {touched.phone && errors.phone && <p style={styles.error}>{errors.phone}</p>}
       </div>
 
