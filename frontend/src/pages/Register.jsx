@@ -1,13 +1,17 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import logo from "../assets/Logo.png";
+import back from "../assets/RegisterBackground.png";
 
-const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", accept: false };
+const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", phone: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
   const [touched, setTouched] = useState({});
   const [focused, setFocused] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
@@ -22,11 +26,12 @@ export default function Register({ width = 420 }) {
   }
 
   function onSubmit(e) {
-    e.preventDefault();
-    if (!isValid) return;
-    // Acá harías la llamada a tu API (fetch/axios)
-    console.log("Registrando usuario:", form);
-    alert("✅ Registro enviado (ver consola)");
+  e.preventDefault();
+  if (!isValid) return;
+  // Acá harías la llamada a tu API (fetch/axios)
+  console.log("Registrando usuario:", form);
+  alert("✅ Registro enviado (ver consola)");
+  navigate("/login");
   }
 
   const strength = passwordStrength(form.password);
@@ -36,8 +41,10 @@ export default function Register({ width = 420 }) {
   };
 
   return (
-    <form onSubmit={onSubmit} style={styles.card}>
-      <h1 style={styles.title}>Crea tu cuenta</h1>
+    <div style={styles.page}>
+      <form onSubmit={onSubmit} style={styles.card}>
+      <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
+      <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
 
       {/* Nombre */}
       <div style={styles.field}>
@@ -78,6 +85,19 @@ export default function Register({ width = 420 }) {
         {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
       </div>
 
+      {/* Teléfono */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="phone">Teléfono</label>
+        <input
+          id="phone" name="phone" value={form.phone}
+          onChange={onChange} onBlur={onBlur}
+          onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
+          placeholder="Ej: 099123456"
+          style={inputStyle(touched.phone && errors.phone, focused === "phone")}
+        />
+        {touched.phone && errors.phone && <p style={styles.error}>{errors.phone}</p>}
+      </div>
+
       {/* Email */}
       <div style={styles.field}>
         <label style={styles.label} htmlFor="email">Email</label>
@@ -94,19 +114,21 @@ export default function Register({ width = 420 }) {
       {/* Password */}
       <div style={styles.field}>
         <label style={styles.label} htmlFor="password">Contraseña</label>
+        <div style={{ position: "relative" }}>
         <input
           id="password" name="password" type={showPassword ? "text" : "password"}
           value={form.password} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("password")} onBlurCapture={() => setFocused(null)}
           placeholder="••••••••"
-          style={inputStyle(touched.password && errors.password, focused === "password")}
-        />
-        <div
+          style={{ ...inputStyle(touched.password && errors.password, focused === "password"), paddingRight: 36 }}
+          />
+        <span
           onClick={togglePassword}
-          style={styles.eyeIcon}
+          style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
         >
           {showPassword ? <FaEyeSlash /> : <FaEye />}
+        </span>
         </div>
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
@@ -136,10 +158,20 @@ export default function Register({ width = 420 }) {
       </label>
       {!form.accept && <small style={{ color: "#94a3b8" }}>Debes aceptar para continuar</small>}
 
-      <button type="submit" disabled={!isValid} style={buttonStyle(!isValid)}>
+      <div style={{ margin: "18px 0 8px 0", textAlign: "center" }}>
+        <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
+        <a
+          href="#"
+          style={{ color: "#30a5e8", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
+          onClick={e => { e.preventDefault(); navigate("/login"); }}
+        >Iniciar sesión</a>
+      </div>
+
+      <button type="submit" disabled={!isValid} style={buttonStyle(!isValid)} >
         Crear cuenta
       </button>
     </form>
+    </div>
   );
 }
 
@@ -147,7 +179,8 @@ function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
   if (!f.secondName.trim()) errs.secondName = "El apellido es obligatorio.";
-  if (!isValidDocument(f.document)) errs.document = "El documento es inválido (8 digit)."
+  if (!isValidDocument(f.document)) errs.document = "El documento es inválido (8 digit).";
+  if (!isValidPhone(f.phone)) errs.phone = "Teléfono inválido (9 dígitos).";
   if (!isValidEmail(f.email)) errs.email = "Email inválido.";
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
   if (!/[A-Z]/.test(f.password)) errs.password ??= "Incluye al menos una mayúscula.";
@@ -164,6 +197,10 @@ function isValidDocument(s) {
   return /^[0-9]{8}$/.test(s);
 }
 
+function isValidPhone(s) {
+  return /^[0-9]{9}$/.test(s);
+}
+
 function passwordStrength(pw) {
   let score = 0;
   if (pw.length >= 8) score++;
@@ -175,29 +212,49 @@ function passwordStrength(pw) {
 }
 
 const styles = {
+  page: {
+    minHeight: "100vh",
+    width: "100vw",
+    backgroundImage: `url(${back})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+  padding: "40px 60px 0 0",
+  backgroundAttachment: "fixed"
+  },
   card: {
-    width: "100%", maxWidth: 420, background: "white",
-    paddingTop: 40,
+    width: "100%", 
+    maxWidth: 550, 
+    minHeight: "100vh",
+    background: "#0f101a94",
+    paddingTop: 20,
     paddingBottom: 40,
     paddingLeft: 24,
-    paddingRight: 48, 
-    borderRadius: 16,
+    paddingRight: 24, 
+    borderRadius: 12,
     boxShadow: "0 10px 30px rgba(0,0,0,.2)",
-    fontFamily: "Montserrat"
+    fontFamily: "Montserrat",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
   },
-  title: { margin: 0, marginBottom: 12, fontSize: 28, color: "#000000ff" },
+  title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
   field: { marginBottom: 14 },
-  label: { fontSize: 14, color: "#334155", marginBottom: 6, display: "block" },
+  label: { fontSize: 14, color: "#bababaff", marginBottom: 6, display: "block" },
   error: { color: "#dc2626", fontSize: 13, marginTop: 6 },
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
-  meterText: { color: "#475569", fontSize: 12, display: "block", marginTop: 6 },
+  meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
   eyeIcon: {position: "realtive", marginTop: 6, color: "#b6b6b6ff", fontSize: "18px"}
 };
 
 function inputStyle(isError, isFocused) {
   return {
-    width: "100%",
+    width: "450px", 
+    maxWidth: "100%",
     padding: "10px 12px",
     borderRadius: 10,
     border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
@@ -214,7 +271,7 @@ function buttonStyle(disabled) {
   return {
     marginTop: 12, width: "100%", padding: "12px 14px",
     borderRadius: 10, border: "none",
-    background: disabled ? "#cbd5e1" : "#30a5e8ff",
+    background: disabled ? "#5fa1f2ff" : "#30a5e8ff",
     color: "white", fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer",
     transition: "filter .2s"
   };

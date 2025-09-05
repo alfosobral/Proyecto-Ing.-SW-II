@@ -1,19 +1,16 @@
 import Register from "./pages/Register";
-import logo from "./assets/HurryHand.svg";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LogIn from "./pages/LogIn";
+import MainPage from "./pages/MainPage"
 
 export default function App() {
   return (
-    <div 
-      style={{ 
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        padding: "20px 0",
-        background: "#8ddfffff" 
-      }}
-    >
-      <Register width={600}/>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Register />} />
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/main_page" element={<MainPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
