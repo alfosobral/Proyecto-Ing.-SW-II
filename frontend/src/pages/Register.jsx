@@ -1,6 +1,8 @@
 import { useState, useMemo , useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import logo from "../assets/Logo.png";
 import back from "../assets/RegisterBackground.png";
 import back2 from "../assets/RegisterBackground2.png";
@@ -9,7 +11,8 @@ import back4 from "../assets/RegisterBackground4.png";
 import back5 from "../assets/RegisterBackground5.png";
 import back6 from "../assets/RegisterBackground6.png";
 
-const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", phone: "", accept: false };
+
+const initial = { name: "", secondName: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
@@ -20,6 +23,13 @@ export default function Register({ width = 420 }) {
 
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
+
+  function maxAdultDate() {
+  const t = new Date();
+  t.setHours(0, 0, 0, 0);
+  t.setFullYear(t.getFullYear() - 18);
+  return t;
+}
 
   function onChange(e) {
     const { name, type, value, checked } = e.target;
@@ -33,8 +43,9 @@ export default function Register({ width = 420 }) {
   function onSubmit(e) {
     e.preventDefault();
     if (!isValid) return;
-    // Acá harías la llamada a tu API (fetch/axios)
-    console.log("Registrando usuario:", form);
+    const payload = toBackendPayload(form);
+    console.log("Payload para backend:", payload);
+    // fetch/axios aquí con payload
     alert("✅ Registro enviado (ver consola)");
     navigate("/login");
   }
@@ -97,6 +108,23 @@ export default function Register({ width = 420 }) {
         {touched.secondName && errors.secondName && <p style={styles.error}>{errors.secondName}</p>}
       </div>
 
+      {/* Tipo de documento */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="documentType">Tipo de documento</label>
+        <select
+          id="documentType"
+          name="documentType"
+          value={form.documentType}
+          onChange={onChange}
+          style={inputStyle(false, focused === "documentType")}
+          onFocus={() => setFocused("documentType")}
+          onBlurCapture={() => setFocused(null)}
+        >
+          <option value="Cedula Uruguaya">Cédula Uruguaya</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
       {/* Documento */}
       <div style={styles.field}>
         <label style={styles.label} htmlFor="document">Documento</label>
@@ -108,10 +136,32 @@ export default function Register({ width = 420 }) {
             }}
             onBlur={onBlur}
             onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
-            placeholder="Cédula"
+            placeholder="Documento"
             style={inputStyle(touched.document && errors.document, focused === "document")}
           />
         {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
+      </div>
+
+      {/* Nacimiento */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="birthDate">Fecha de Nacimiento</label>
+          <DatePicker
+            id="birthDate"
+            selected={form.birthDate instanceof Date ? form.birthDate : null}
+            onChange={(dateOrArray) => {
+              // react-datepicker puede enviar [start, end] si activás rangos
+              const date = Array.isArray(dateOrArray) ? dateOrArray[0] : dateOrArray;
+              setForm(prev => ({ ...prev, birthDate: date ?? null }));
+            }}
+            dateFormat="dd/MM/yyyy"
+            showYearDropdown
+            scrollableYearDropdown
+            placeholderText="DD/MM/AAAA"
+            maxDate={maxAdultDate()} // mayor de 18
+            withPortal
+            className="birthdate-input" // podés customizar con CSS o con tu inputStyle
+          />
+        {touched.birthDate && errors.birthDate && <p style={styles.error}>{errors.birthDate}</p>}
       </div>
 
       {/* Teléfono */}
@@ -245,6 +295,25 @@ function passwordStrength(pw) {
   return { score, label: labels[score] };
 }
 
+function isValidAge(bd) {
+  const dob = parseDobToDate(form.birthDate);
+  return 18 <= dob
+}
+
+function toBackendPayload(form) {
+  return {
+    email: form.email,
+    password: form.password,
+    name: form.name,
+    surname: form.secondName,
+    personalId: form.document,
+    personalIdType: form.documentType === "Cedula Uruguaya" ? "DNI_URUGUAYO" : "OTRO",
+    birthdate: form.birthDate
+      ? form.birthDate.toISOString().slice(0, 10)
+      : null
+  };
+}
+
 const styles = {
   page: {
     minHeight: "100vh",
@@ -291,7 +360,7 @@ function inputStyle(isError, isFocused) {
     maxWidth: "100%",
     padding: "10px 12px",
     borderRadius: 10,
-    border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
+    border: `4px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
     outline: "none",
     fontSize: 14,
     transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
