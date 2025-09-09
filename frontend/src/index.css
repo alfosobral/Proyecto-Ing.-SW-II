@@ -34,3 +34,50 @@ img, svg {
   height: auto;
   display: block;
 }
+
+/* Slideshow fijo al viewport */
+.bg-slideshow {
+  position: fixed;     /* <— clave */
+  inset: 0;            /* top:0; right:0; bottom:0; left:0 */
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;      /* no bloquea clicks del form */
+  transform: translateZ(0);  /* ayuda a evitar jank en móviles */
+}
+
+.bg-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* llena sin deformar */
+  object-position: center;
+  opacity: 0;
+  transform: scale(1.01);
+  transition: opacity 1.2s ease, transform 8s ease;
+  filter: saturate(1.05) contrast(1.02) brightness(1.06);
+}
+
+.bg-slide.is-active {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+/* viñeta suave para legibilidad */
+.bg-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 80% 20%,
+    rgba(0,0,0,0.04) 0%,
+    rgba(0,0,0,0.20) 55%,
+    rgba(0,0,0,0.36) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-slide { transition: none; transform: none; }
+}

@@ -1,8 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo , useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../assets/Logo.png";
 import back from "../assets/RegisterBackground.png";
+import back2 from "../assets/RegisterBackground2.png";
+import back3 from "../assets/RegisterBackground3.png";
+import back4 from "../assets/RegisterBackground4.png";
+import back5 from "../assets/RegisterBackground5.png";
+import back6 from "../assets/RegisterBackground6.png";
 
 const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", phone: "", accept: false };
 
@@ -26,12 +31,12 @@ export default function Register({ width = 420 }) {
   }
 
   function onSubmit(e) {
-  e.preventDefault();
-  if (!isValid) return;
-  // Acá harías la llamada a tu API (fetch/axios)
-  console.log("Registrando usuario:", form);
-  alert("✅ Registro enviado (ver consola)");
-  navigate("/login");
+    e.preventDefault();
+    if (!isValid) return;
+    // Acá harías la llamada a tu API (fetch/axios)
+    console.log("Registrando usuario:", form);
+    alert("✅ Registro enviado (ver consola)");
+    navigate("/login");
   }
 
   const strength = passwordStrength(form.password);
@@ -40,9 +45,29 @@ export default function Register({ width = 420 }) {
     setShowPassword(!showPassword);
   };
 
+  const backgrounds = [back, back2, back3, back4, back5, back6];
+  const [idx, setIdx] = useState(0);
+
+   useEffect(() => {
+    backgrounds.forEach(src => { const i = new Image(); i.src = src; });
+  }, [backgrounds]);
+
+  useEffect(() => {
+    if (backgrounds.length <= 1) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % backgrounds.length), 5000);
+    return () => clearInterval(t);
+  }, [backgrounds.length]);
+
   return (
     <div style={styles.page}>
-      <form onSubmit={onSubmit} style={styles.card}>
+      {/* Slideshow de fondo (las clases están en index.css) */}
+      <div className="bg-slideshow" aria-hidden>
+        {backgrounds.map((src, i) => (
+          <img key={i} src={src} alt="" className={`bg-slide ${i === idx ? "is-active" : ""}`} />
+        ))}
+        <div className="bg-vignette" />
+      </div>
+      <form onSubmit={onSubmit} style={{...styles.card, zIndex: 10}}>
       <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
       <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
 
@@ -193,6 +218,7 @@ function validate(f) {
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
   if (!/[A-Z]/.test(f.password)) errs.password ??= "Incluye al menos una mayúscula.";
   if (!/[0-9]/.test(f.password)) errs.password ??= "Incluye al menos un número.";
+  if (!/[^A-Za-z0-9]/.test(f.password)) errs.password ??= "Incluye al menos un símbolo.";
   if (f.confirm !== f.password) errs.confirm = "Las contraseñas no coinciden.";
   return errs;
 }
