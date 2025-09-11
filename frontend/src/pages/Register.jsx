@@ -1,10 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo , useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import logo from "../assets/Logo.png";
 import back from "../assets/RegisterBackground.png";
+import back2 from "../assets/RegisterBackground2.png";
+import back3 from "../assets/RegisterBackground3.png";
+import back4 from "../assets/RegisterBackground4.png";
+import back5 from "../assets/RegisterBackground5.png";
+import back6 from "../assets/RegisterBackground6.png";
+import back7 from "../assets/RegisterBackground7.png";
+import back8 from "../assets/RegisterBackground8.png";
 
-const initial = { name: "", secondName: "", document:"", email: "", password: "", confirm: "", phone: "", accept: false };
+
+const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
@@ -16,6 +26,13 @@ export default function Register({ width = 420 }) {
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
 
+  function maxAdultDate() {
+  const t = new Date();
+  t.setHours(0, 0, 0, 0);
+  t.setFullYear(t.getFullYear() - 18);
+  return t;
+}
+
   function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
@@ -26,12 +43,13 @@ export default function Register({ width = 420 }) {
   }
 
   function onSubmit(e) {
-  e.preventDefault();
-  if (!isValid) return;
-  // Acá harías la llamada a tu API (fetch/axios)
-  console.log("Registrando usuario:", form);
-  alert("✅ Registro enviado (ver consola)");
-  navigate("/login");
+    e.preventDefault();
+    if (!isValid) return;
+    const payload = toBackendPayload(form);
+    console.log("Payload para backend:", payload);
+    // fetch/axios aquí con payload
+    alert("✅ Registro enviado (ver consola)");
+    navigate("/login");
   }
 
   const strength = passwordStrength(form.password);
@@ -40,9 +58,29 @@ export default function Register({ width = 420 }) {
     setShowPassword(!showPassword);
   };
 
+  const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
+  const [idx, setIdx] = useState(0);
+
+   useEffect(() => {
+    backgrounds.forEach(src => { const i = new Image(); i.src = src; });
+  }, [backgrounds]);
+
+  useEffect(() => {
+    if (backgrounds.length <= 1) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % backgrounds.length), 5000);
+    return () => clearInterval(t);
+  }, [backgrounds.length]);
+
   return (
     <div style={styles.page}>
-      <form onSubmit={onSubmit} style={styles.card}>
+      {/* Slideshow de fondo (las clases están en index.css) */}
+      <div className="bg-slideshow" aria-hidden>
+        {backgrounds.map((src, i) => (
+          <img key={i} src={src} alt="" className={`bg-slide ${i === idx ? "is-active" : ""}`} />
+        ))}
+        <div className="bg-vignette" />
+      </div>
+      <form onSubmit={onSubmit} style={{...styles.card, zIndex: 10}}>
       <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
       <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
 
@@ -61,15 +99,32 @@ export default function Register({ width = 420 }) {
 
       {/* Apellido */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="secondName">Apellido</label>
+        <label style={styles.label} htmlFor="surname">Apellido</label>
         <input
-          id="secondName" name="secondName" value={form.secondName} 
+          id="surname" name="surname" value={form.surname} 
           onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("secondName")} onBlurCapture={() => setFocused(null)}
+          onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
           placeholder="Tu apellido"
-          style={inputStyle(touched.secondName && errors.secondName, focused === "secondName")}
+          style={inputStyle(touched.surname && errors.surname, focused === "surname")}
         />
-        {touched.secondName && errors.secondName && <p style={styles.error}>{errors.secondName}</p>}
+        {touched.surname && errors.surname && <p style={styles.error}>{errors.surname}</p>}
+      </div>
+
+      {/* Tipo de documento */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="documentType">Tipo de documento</label>
+        <select
+          id="documentType"
+          name="documentType"
+          value={form.documentType}
+          onChange={onChange}
+          style={inputStyle(false, focused === "documentType")}
+          onFocus={() => setFocused("documentType")}
+          onBlurCapture={() => setFocused(null)}
+        >
+          <option value="Cedula Uruguaya">Cédula Uruguaya</option>
+          <option value="Otro">Otro</option>
+        </select>
       </div>
 
       {/* Documento */}
@@ -78,15 +133,42 @@ export default function Register({ width = 420 }) {
           <input
             id="document" name="document" value={form.document}
             onChange={e => {
-              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 8);
+              let value = e.target.value;
+              if (form.documentType === "Cedula Uruguaya") {
+                value = value.replace(/[^0-9]/g, "").slice(0, 8);
+              } else {
+                value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
+              }
               setForm(f => ({ ...f, document: value }));
             }}
             onBlur={onBlur}
             onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
-            placeholder="Cédula"
+            placeholder="Documento"
             style={inputStyle(touched.document && errors.document, focused === "document")}
           />
         {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
+      </div>
+
+      {/* Nacimiento */}
+      <div style={styles.field}>
+        <label style={styles.label} htmlFor="birthDate">Fecha de Nacimiento</label>
+          <DatePicker
+            id="birthDate"
+            selected={form.birthDate instanceof Date ? form.birthDate : null}
+            onChange={(dateOrArray) => {
+              // react-datepicker puede enviar [start, end] si activás rangos
+              const date = Array.isArray(dateOrArray) ? dateOrArray[0] : dateOrArray;
+              setForm(prev => ({ ...prev, birthDate: date ?? null }));
+            }}
+            dateFormat="dd/MM/yyyy"
+            showYearDropdown
+            scrollableYearDropdown
+            placeholderText="DD/MM/AAAA"
+            maxDate={maxAdultDate()} // mayor de 18
+            withPortal
+            className="birthdate-input" // podés customizar con CSS o con tu inputStyle
+          />
+        {touched.birthDate && errors.birthDate && <p style={styles.error}>{errors.birthDate}</p>}
       </div>
 
       {/* Teléfono */}
@@ -186,13 +268,18 @@ export default function Register({ width = 420 }) {
 function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
-  if (!f.secondName.trim()) errs.secondName = "El apellido es obligatorio.";
-  if (!isValidDocument(f.document)) errs.document = "El documento es inválido (8 digit).";
+  if (!f.surname.trim()) errs.surname = "El apellido es obligatorio.";
+  if (!isValidDocument(f.document, f.documentType)) {
+    errs.document = f.documentType === "Cedula Uruguaya"
+      ? "El documento debe tener 8 dígitos numéricos."
+      : "El documento es obligatorio (alfanumérico, mínimo 4 caracteres).";
+  }
   if (!isValidPhone(f.phone)) errs.phone = "Teléfono inválido (9 dígitos).";
   if (!isValidEmail(f.email)) errs.email = "Email inválido.";
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
   if (!/[A-Z]/.test(f.password)) errs.password ??= "Incluye al menos una mayúscula.";
   if (!/[0-9]/.test(f.password)) errs.password ??= "Incluye al menos un número.";
+  if (!/[^A-Za-z0-9]/.test(f.password)) errs.password ??= "Incluye al menos un símbolo.";
   if (f.confirm !== f.password) errs.confirm = "Las contraseñas no coinciden.";
   return errs;
 }
@@ -201,8 +288,12 @@ function isValidEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
-function isValidDocument(s) {
-  return /^[0-9]{8}$/.test(s);
+function isValidDocument(s, type) {
+  if (type === "Cedula Uruguaya") {
+    return /^[0-9]{8}$/.test(s);
+  } else {
+    return /^[A-Za-z0-9]{4,}$/.test(s); // mínimo 4 caracteres alfanuméricos
+  }
 }
 
 function isValidPhone(s) {
@@ -217,6 +308,25 @@ function passwordStrength(pw) {
   if (/[^A-Za-z0-9]/.test(pw)) score++;
   const labels = ["Muy débil", "Débil", "Aceptable", "Fuerte", "Muy fuerte"];
   return { score, label: labels[score] };
+}
+
+function isValidAge(bd) {
+  const dob = parseDobToDate(form.birthDate);
+  return 18 <= dob
+}
+
+function toBackendPayload(form) {
+  return {
+    email: form.email,
+    password: form.password,
+    name: form.name,
+    surname: form.surname,
+    personalId: form.document,
+    personalIdType: form.documentType === "Cedula Uruguaya" ? "DNI_URUGUAYO" : "OTRO",
+    birthdate: form.birthDate
+      ? form.birthDate.toISOString().slice(0, 10)
+      : null
+  };
 }
 
 const styles = {
@@ -237,7 +347,7 @@ const styles = {
     width: "100%", 
     maxWidth: 550, 
     minHeight: "100vh",
-    background: "#0f101a94",
+    background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
     paddingTop: 20,
     paddingBottom: 40,
     paddingLeft: 24,
@@ -247,7 +357,9 @@ const styles = {
     fontFamily: "Montserrat",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
+    backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
+    WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
   },
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
   field: { marginBottom: 14 },
@@ -265,7 +377,7 @@ function inputStyle(isError, isFocused) {
     maxWidth: "100%",
     padding: "10px 12px",
     borderRadius: 10,
-    border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
+    border: `4px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
     outline: "none",
     fontSize: 14,
     transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",

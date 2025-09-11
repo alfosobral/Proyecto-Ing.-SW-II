@@ -119,16 +119,22 @@ export default function LogIn() {
 		justifyContent: "center"
 	},  
 	card: {
-		width: "100%",
-		maxWidth: 480,
-		background: "rgba(15, 16, 26, 0.81)",
-		padding: 32,
+		width: "100%", 
+		maxWidth: 550, 
+		minHeight: "100vh",
+		background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
+		paddingTop: 20,
+		paddingBottom: 40,
+		paddingLeft: 24,
+		paddingRight: 24, 
 		borderRadius: 12,
 		boxShadow: "0 10px 30px rgba(0,0,0,.2)",
 		fontFamily: "Montserrat",
 		display: "flex",
 		flexDirection: "column",
-		alignItems: "center"
+		alignItems: "center",
+		backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
+		WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
 	},
 	title: { margin: 0, marginBottom: 20, fontSize: 28, color: "#fff", textAlign: "center" },
 	field: { marginBottom: 18, width: "100%" },
