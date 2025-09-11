@@ -12,6 +12,12 @@ import back5 from "../assets/RegisterBackground5.png";
 import back6 from "../assets/RegisterBackground6.png";
 import back7 from "../assets/RegisterBackground7.png";
 import back8 from "../assets/RegisterBackground8.png";
+import InputField from "../components/InputField";
+import PasswordField from "../components/PasswordField";
+import SelectField from "../components/SelectField";
+import CheckboxField from "../components/CheckboxField";
+import Card from "../components/Card";
+import DateField from "../components/DateField";
 
 
 const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
@@ -80,18 +86,23 @@ export default function Register({ width = 420 }) {
         ))}
         <div className="bg-vignette" />
       </div>
-      <form onSubmit={onSubmit} style={{...styles.card, zIndex: 10}}>
+      <Card style={{ zIndex: 10 }}>
+      <form onSubmit={onSubmit}>
       <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
       <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
 
       {/* Nombre */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="name">Nombre</label>
-        <input
-          id="name" name="name" value={form.name} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("name")} onBlurCapture={() => setFocused(null)}
+        <InputField
+          id="name"
+          label="Nombre"
+          value={form.name}
+          onChange={onChange}
+          onBlur={onBlur}
+          onFocus={() => setFocused("name")}
           placeholder="Tu nombre"
+          error={errors.name}
+          touched={touched.name}
           style={inputStyle(touched.name && errors.name, focused === "name")}
         />
         {touched.name && errors.name && <p style={styles.error}>{errors.name}</p>}
@@ -99,9 +110,11 @@ export default function Register({ width = 420 }) {
 
       {/* Apellido */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="surname">Apellido</label>
-        <input
-          id="surname" name="surname" value={form.surname} 
+        <InputField
+          id="surname" 
+          label="Apellido"
+          name="surname" 
+          value={form.surname} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
           placeholder="Tu apellido"
@@ -112,26 +125,28 @@ export default function Register({ width = 420 }) {
 
       {/* Tipo de documento */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="documentType">Tipo de documento</label>
-        <select
+        <SelectField
           id="documentType"
-          name="documentType"
+          label="Tipo de documento"
           value={form.documentType}
           onChange={onChange}
-          style={inputStyle(false, focused === "documentType")}
           onFocus={() => setFocused("documentType")}
-          onBlurCapture={() => setFocused(null)}
-        >
-          <option value="Cedula Uruguaya">Cédula Uruguaya</option>
-          <option value="Otro">Otro</option>
-        </select>
+          onBlur={() => setFocused(null)}
+          options={[
+            { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
+            { value: "Otro", label: "Otro" }
+          ]}
+          style={inputStyle(touched.documentType && errors.documentType, focused === "documentType")}
+        />
       </div>
 
       {/* Documento */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="document">Documento</label>
-          <input
-            id="document" name="document" value={form.document}
+          <InputField
+            id="document" 
+            label="Documento"
+            name="document" 
+            value={form.document}
             onChange={e => {
               let value = e.target.value;
               if (form.documentType === "Cedula Uruguaya") {
@@ -151,31 +166,26 @@ export default function Register({ width = 420 }) {
 
       {/* Nacimiento */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="birthDate">Fecha de Nacimiento</label>
-          <DatePicker
+          <DateField
             id="birthDate"
-            selected={form.birthDate instanceof Date ? form.birthDate : null}
-            onChange={(dateOrArray) => {
-              // react-datepicker puede enviar [start, end] si activás rangos
-              const date = Array.isArray(dateOrArray) ? dateOrArray[0] : dateOrArray;
-              setForm(prev => ({ ...prev, birthDate: date ?? null }));
-            }}
-            dateFormat="dd/MM/yyyy"
-            showYearDropdown
-            scrollableYearDropdown
-            placeholderText="DD/MM/AAAA"
-            maxDate={maxAdultDate()} // mayor de 18
-            withPortal
-            className="birthdate-input" // podés customizar con CSS o con tu inputStyle
+            label="Fecha de nacimiento"
+            value={form.birthDate ? form.birthDate.toISOString().slice(0, 10) : ""}
+            onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
+            onBlur={onBlur}
+            onFocus={() => setFocused("birthDate")}
+            error={errors.birthDate}
+            touched={touched.birthDate}
+            style={inputStyle(touched.birthDate && errors.birthDate, focused === "birthDate")}
           />
-        {touched.birthDate && errors.birthDate && <p style={styles.error}>{errors.birthDate}</p>}
       </div>
 
       {/* Teléfono */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="phone">Teléfono</label>
-          <input
-            id="phone" name="phone" value={form.phone}
+          <InputField
+            id="phone" 
+            label="Teléfono"
+            name="phone" 
+            value={form.phone}
             onChange={e => {
               const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
               setForm(f => ({ ...f, phone: value }));
@@ -190,9 +200,11 @@ export default function Register({ width = 420 }) {
 
       {/* Email */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="email">Email</label>
-        <input
-          id="email" name="email" value={form.email} 
+        <InputField
+          id="email" 
+          label="Email"
+          name="email" 
+          value={form.email} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
           placeholder="tu@email.com"
@@ -203,35 +215,35 @@ export default function Register({ width = 420 }) {
 
       {/* Password */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="password">Contraseña</label>
         <div style={{ position: "relative" }}>
-        <input
-          id="password" name="password" type={showPassword ? "text" : "password"}
-          value={form.password} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("password")} onBlurCapture={() => setFocused(null)}
+        <PasswordField
+          id="password"
+          label="Contraseña"
+          value={form.password}
+          onChange={onChange}
+          onBlur={onBlur}
+          onFocus={() => setFocused("password")}
           placeholder="••••••••"
-          style={{ ...inputStyle(touched.password && errors.password, focused === "password"), paddingRight: 36 }}
-          />
-        <span
-          onClick={togglePassword}
-          style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
-        >
-          {showPassword ? <FaEyeSlash /> : <FaEye />}
-        </span>
+          error={errors.password}
+          touched={touched.password}
+          style={inputStyle(touched.password && errors.password, focused === "password")}
+          showPassword={showPassword}
+          togglePassword={togglePassword}
+        />
         </div>
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
         </div>
         <small style={styles.meterText}>{strength.label}</small>
-        {touched.password && errors.password && <p style={styles.error}>{errors.password}</p>}
       </div>
 
       {/* Confirm */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="confirm">Confirmar contraseña</label>
-        <input
-          id="confirm" name="confirm" type="password"
+        <InputField
+          id="confirm" 
+          label="Confirmar contraseña"
+          name="confirm" 
+          type="password"
           value={form.confirm} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("confirm")} onBlurCapture={() => setFocused(null)}
@@ -242,11 +254,13 @@ export default function Register({ width = 420 }) {
       </div>
 
       {/* Términos */}
-      <label style={{ ...styles.label, display: "flex", gap: 8, alignItems: "center" }}>
-        <input type="checkbox" name="accept" checked={form.accept} onChange={onChange} />
-        Acepto los términos y condiciones
-      </label>
-      {!form.accept && <small style={{ color: "#94a3b8" }}>Debes aceptar para continuar</small>}
+      <CheckboxField
+        id="accept"
+        label="Acepto los términos y condiciones"
+        checked={form.accept}
+        onChange={onChange}
+        error={!form.accept ? "Debes aceptar para continuar" : ""}
+      />
 
       <div style={{ margin: "18px 0 8px 0", textAlign: "center" }}>
         <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
@@ -261,6 +275,7 @@ export default function Register({ width = 420 }) {
         Crear cuenta
       </button>
     </form>
+    </Card>
     </div>
   );
 }
@@ -281,6 +296,11 @@ function validate(f) {
   if (!/[0-9]/.test(f.password)) errs.password ??= "Incluye al menos un número.";
   if (!/[^A-Za-z0-9]/.test(f.password)) errs.password ??= "Incluye al menos un símbolo.";
   if (f.confirm !== f.password) errs.confirm = "Las contraseñas no coinciden.";
+  if (!f.birthDate) {
+    errs.birthDate = "La fecha de nacimiento es obligatoria.";
+  } else if (isValidAge(f.birthDate) < 18) {
+    errs.birthDate = "Debes ser mayor de 18 años.";
+  }
   return errs;
 }
 
@@ -310,9 +330,15 @@ function passwordStrength(pw) {
   return { score, label: labels[score] };
 }
 
-function isValidAge(bd) {
-  const dob = parseDobToDate(form.birthDate);
-  return 18 <= dob
+function isValidAge(birthDate) {
+  if (!birthDate) return false;
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    return age - 1;
+  }
+  return age;
 }
 
 function toBackendPayload(form) {
