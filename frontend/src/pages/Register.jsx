@@ -12,7 +12,7 @@ import back5 from "../assets/RegisterBackground5.png";
 import back6 from "../assets/RegisterBackground6.png";
 
 
-const initial = { name: "", secondName: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
+const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
@@ -99,7 +99,7 @@ export default function Register({ width = 420 }) {
       <div style={styles.field}>
         <label style={styles.label} htmlFor="secondName">Apellido</label>
         <input
-          id="secondName" name="secondName" value={form.secondName} 
+          id="secondName" name="secondName" value={form.surname} 
           onChange={onChange} onBlur={onBlur}
           onFocus={() => setFocused("secondName")} onBlurCapture={() => setFocused(null)}
           placeholder="Tu apellido"
@@ -131,7 +131,12 @@ export default function Register({ width = 420 }) {
           <input
             id="document" name="document" value={form.document}
             onChange={e => {
-              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 8);
+              let value = e.target.value;
+              if (form.documentType === "Cedula Uruguaya") {
+                value = value.replace(/[^0-9]/g, "").slice(0, 8);
+              } else {
+                value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
+              }
               setForm(f => ({ ...f, document: value }));
             }}
             onBlur={onBlur}
@@ -262,7 +267,11 @@ function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
   if (!f.secondName.trim()) errs.secondName = "El apellido es obligatorio.";
-  if (!isValidDocument(f.document)) errs.document = "El documento es inválido (8 digit).";
+  if (!isValidDocument(f.document, f.documentType)) {
+    errs.document = f.documentType === "Cedula Uruguaya"
+      ? "El documento debe tener 8 dígitos numéricos."
+      : "El documento es obligatorio (alfanumérico, mínimo 4 caracteres).";
+  }
   if (!isValidPhone(f.phone)) errs.phone = "Teléfono inválido (9 dígitos).";
   if (!isValidEmail(f.email)) errs.email = "Email inválido.";
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
@@ -277,8 +286,12 @@ function isValidEmail(s) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
 
-function isValidDocument(s) {
-  return /^[0-9]{8}$/.test(s);
+function isValidDocument(s, type) {
+  if (type === "Cedula Uruguaya") {
+    return /^[0-9]{8}$/.test(s);
+  } else {
+    return /^[A-Za-z0-9]{4,}$/.test(s); // mínimo 4 caracteres alfanuméricos
+  }
 }
 
 function isValidPhone(s) {
