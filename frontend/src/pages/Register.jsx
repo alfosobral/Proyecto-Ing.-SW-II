@@ -10,6 +10,8 @@ import back3 from "../assets/RegisterBackground3.png";
 import back4 from "../assets/RegisterBackground4.png";
 import back5 from "../assets/RegisterBackground5.png";
 import back6 from "../assets/RegisterBackground6.png";
+import back7 from "../assets/RegisterBackground7.png";
+import back8 from "../assets/RegisterBackground8.png";
 
 
 const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
@@ -56,7 +58,7 @@ export default function Register({ width = 420 }) {
     setShowPassword(!showPassword);
   };
 
-  const backgrounds = [back, back2, back3, back4, back5, back6];
+  const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
   const [idx, setIdx] = useState(0);
 
    useEffect(() => {
@@ -97,15 +99,15 @@ export default function Register({ width = 420 }) {
 
       {/* Apellido */}
       <div style={styles.field}>
-        <label style={styles.label} htmlFor="secondName">Apellido</label>
+        <label style={styles.label} htmlFor="surname">Apellido</label>
         <input
-          id="secondName" name="secondName" value={form.surname} 
+          id="surname" name="surname" value={form.surname} 
           onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("secondName")} onBlurCapture={() => setFocused(null)}
+          onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
           placeholder="Tu apellido"
-          style={inputStyle(touched.secondName && errors.secondName, focused === "secondName")}
+          style={inputStyle(touched.surname && errors.surname, focused === "surname")}
         />
-        {touched.secondName && errors.secondName && <p style={styles.error}>{errors.secondName}</p>}
+        {touched.surname && errors.surname && <p style={styles.error}>{errors.surname}</p>}
       </div>
 
       {/* Tipo de documento */}
@@ -266,7 +268,7 @@ export default function Register({ width = 420 }) {
 function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
-  if (!f.secondName.trim()) errs.secondName = "El apellido es obligatorio.";
+  if (!f.surname.trim()) errs.surname = "El apellido es obligatorio.";
   if (!isValidDocument(f.document, f.documentType)) {
     errs.document = f.documentType === "Cedula Uruguaya"
       ? "El documento debe tener 8 dígitos numéricos."
@@ -318,7 +320,7 @@ function toBackendPayload(form) {
     email: form.email,
     password: form.password,
     name: form.name,
-    surname: form.secondName,
+    surname: form.surname,
     personalId: form.document,
     personalIdType: form.documentType === "Cedula Uruguaya" ? "DNI_URUGUAYO" : "OTRO",
     birthdate: form.birthDate
@@ -345,7 +347,7 @@ const styles = {
     width: "100%", 
     maxWidth: 550, 
     minHeight: "100vh",
-    background: "#0f101a94",
+    background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
     paddingTop: 20,
     paddingBottom: 40,
     paddingLeft: 24,
@@ -355,7 +357,9 @@ const styles = {
     fontFamily: "Montserrat",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
+    backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
+    WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
   },
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
   field: { marginBottom: 14 },
