@@ -2,6 +2,9 @@ import Register from "./pages/Register";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LogIn from "./pages/LogIn";
 import MainPage from "./pages/MainPage"
+import ServiceProvider from "./pages/ServiceProvider";
+
+
 
 function App() {
   return (
@@ -11,6 +14,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/register" element={<Register />} />
         <Route path="/main_page" element={<MainPage />} />
+        <Route path="/service_provider" element={<ServiceProvider />} />
       </Routes>
     </BrowserRouter>
   );
