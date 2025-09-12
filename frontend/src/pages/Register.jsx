@@ -92,145 +92,116 @@ export default function Register({ width = 420 }) {
       <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
 
       {/* Nombre */}
-      <div style={styles.field}>
-        <InputField
-          id="name"
-          label="Nombre"
-          value={form.name}
-          onChange={onChange}
-          onBlur={onBlur}
-          onFocus={() => setFocused("name")}
-          placeholder="Tu nombre"
-          error={errors.name}
-          touched={touched.name}
-          style={inputStyle(touched.name && errors.name, focused === "name")}
-        />
-        {touched.name && errors.name && <p style={styles.error}>{errors.name}</p>}
-      </div>
+      <InputField
+        id="name"
+        label="Nombre"
+        value={form.name}
+        onChange={onChange}
+        onBlur={onBlur}
+        onFocus={() => setFocused("name")}
+        placeholder="Tu nombre"
+        error={errors.name}
+        touched={touched.name}
+      />
 
       {/* Apellido */}
-      <div style={styles.field}>
-        <InputField
-          id="surname" 
-          label="Apellido"
-          name="surname" 
-          value={form.surname} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
-          placeholder="Tu apellido"
-          style={inputStyle(touched.surname && errors.surname, focused === "surname")}
-        />
-        {touched.surname && errors.surname && <p style={styles.error}>{errors.surname}</p>}
-      </div>
+      <InputField
+        id="surname" 
+        label="Apellido"
+        name="surname" 
+        value={form.surname} 
+        onChange={onChange} onBlur={onBlur}
+        onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
+        placeholder="Tu apellido"
+      />
 
       {/* Tipo de documento */}
-      <div style={styles.field}>
-        <SelectField
-          id="documentType"
-          label="Tipo de documento"
-          value={form.documentType}
-          onChange={onChange}
-          onFocus={() => setFocused("documentType")}
-          onBlur={() => setFocused(null)}
-          options={[
-            { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
-            { value: "Otro", label: "Otro" }
-          ]}
-          style={inputStyle(touched.documentType && errors.documentType, focused === "documentType")}
-        />
-      </div>
+      <SelectField
+        id="documentType"
+        label="Tipo de documento"
+        value={form.documentType}
+        onChange={onChange}
+        onFocus={() => setFocused("documentType")}
+        onBlur={() => setFocused(null)}
+        options={[
+          { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
+          { value: "Otro", label: "Otro" }
+        ]}
+      />
 
       {/* Documento */}
-      <div style={styles.field}>
-          <InputField
-            id="document" 
-            label="Documento"
-            name="document" 
-            value={form.document}
-            onChange={e => {
-              let value = e.target.value;
-              if (form.documentType === "Cedula Uruguaya") {
-                value = value.replace(/[^0-9]/g, "").slice(0, 8);
-              } else {
-                value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
-              }
-              setForm(f => ({ ...f, document: value }));
-            }}
-            onBlur={onBlur}
-            onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
-            placeholder="Documento"
-            style={inputStyle(touched.document && errors.document, focused === "document")}
-          />
-        {touched.document && errors.document && <p style={styles.error}>{errors.document}</p>}
-      </div>
+      <InputField
+        id="document" 
+        label="Documento"
+        name="document" 
+        value={form.document}
+        onChange={e => {
+          let value = e.target.value;
+          if (form.documentType === "Cedula Uruguaya") {
+            value = value.replace(/[^0-9]/g, "").slice(0, 8);
+          } else {
+            value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
+          }
+          setForm(f => ({ ...f, document: value }));
+        }}
+        onBlur={onBlur}
+        onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
+        placeholder="Documento"
+      />
 
       {/* Nacimiento */}
-      <div style={styles.field}>
-          <DateField
-            id="birthDate"
-            label="Fecha de nacimiento"
-            value={form.birthDate ? form.birthDate.toISOString().slice(0, 10) : ""}
-            onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
-            onBlur={onBlur}
-            onFocus={() => setFocused("birthDate")}
-            error={errors.birthDate}
-            touched={touched.birthDate}
-            style={inputStyle(touched.birthDate && errors.birthDate, focused === "birthDate")}
-          />
-      </div>
+      <DateField
+        id="birthDate"
+        label="Fecha de nacimiento"
+        value={form.birthDate ? form.birthDate.toISOString().slice(0, 10) : ""}
+        onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
+        onBlur={onBlur}
+        onFocus={() => setFocused("birthDate")}
+        error={errors.birthDate}
+        touched={touched.birthDate}
+      />
 
       {/* Teléfono */}
-      <div style={styles.field}>
-          <InputField
-            id="phone" 
-            label="Teléfono"
-            name="phone" 
-            value={form.phone}
-            onChange={e => {
-              const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
-              setForm(f => ({ ...f, phone: value }));
-            }}
-            onBlur={onBlur}
-            onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
-            placeholder="Teléfono"
-            style={inputStyle(touched.phone && errors.phone, focused === "phone")}
-          />
-        {touched.phone && errors.phone && <p style={styles.error}>{errors.phone}</p>}
-      </div>
+      <InputField
+        id="phone" 
+        label="Teléfono"
+        name="phone" 
+        value={form.phone}
+        onChange={e => {
+          const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
+          setForm(f => ({ ...f, phone: value }));
+        }}
+        onBlur={onBlur}
+        onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
+        placeholder="Teléfono"
+      />
 
       {/* Email */}
-      <div style={styles.field}>
-        <InputField
-          id="email" 
-          label="Email"
-          name="email" 
-          value={form.email} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
-          placeholder="tu@email.com"
-          style={inputStyle(touched.email && errors.email, focused === "email")}
-        />
-        {touched.email && errors.email && <p style={styles.error}>{errors.email}</p>}
-      </div>
+      <InputField
+        id="email" 
+        label="Email"
+        name="email" 
+        value={form.email} 
+        onChange={onChange} onBlur={onBlur}
+        onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
+        placeholder="tu@email.com"
+      />
 
       {/* Password */}
-      <div style={styles.field}>
-        <div style={{ position: "relative" }}>
-        <PasswordField
-          id="password"
-          label="Contraseña"
-          value={form.password}
-          onChange={onChange}
-          onBlur={onBlur}
-          onFocus={() => setFocused("password")}
-          placeholder="••••••••"
-          error={errors.password}
-          touched={touched.password}
-          style={inputStyle(touched.password && errors.password, focused === "password")}
-          showPassword={showPassword}
-          togglePassword={togglePassword}
-        />
-        </div>
+      <PasswordField
+        id="password"
+        label="Contraseña"
+        value={form.password}
+        onChange={onChange}
+        onBlur={onBlur}
+        onFocus={() => setFocused("password")}
+        placeholder="••••••••"
+        error={errors.password}
+        touched={touched.password}
+        showPassword={showPassword}
+        togglePassword={togglePassword}
+      />
+      <div>
         <div style={styles.meterWrap} aria-hidden>
           <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
         </div>
@@ -238,20 +209,16 @@ export default function Register({ width = 420 }) {
       </div>
 
       {/* Confirm */}
-      <div style={styles.field}>
-        <InputField
-          id="confirm" 
-          label="Confirmar contraseña"
-          name="confirm" 
-          type="password"
-          value={form.confirm} 
-          onChange={onChange} onBlur={onBlur}
-          onFocus={() => setFocused("confirm")} onBlurCapture={() => setFocused(null)}
-          placeholder="Repite la contraseña"
-          style={inputStyle(touched.confirm && errors.confirm, focused === "confirm")}
-        />
-        {touched.confirm && errors.confirm && <p style={styles.error}>{errors.confirm}</p>}
-      </div>
+      <InputField
+        id="confirm" 
+        label="Confirmar contraseña"
+        name="confirm" 
+        type="password"
+        value={form.confirm} 
+        onChange={onChange} onBlur={onBlur}
+        onFocus={() => setFocused("confirm")} onBlurCapture={() => setFocused(null)}
+        placeholder="Repite la contraseña"
+      />
 
       {/* Términos */}
       <CheckboxField
@@ -388,30 +355,11 @@ const styles = {
     WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
   },
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
-  field: { marginBottom: 14 },
-  label: { fontSize: 14, color: "#bababaff", marginBottom: 6, display: "block" },
-  error: { color: "#dc2626", fontSize: 13, marginTop: 6 },
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
   meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
-  eyeIcon: {position: "realtive", marginTop: 6, color: "#b6b6b6ff", fontSize: "18px"}
 };
 
-function inputStyle(isError, isFocused) {
-  return {
-    width: "450px", 
-    maxWidth: "100%",
-    padding: "10px 12px",
-    borderRadius: 10,
-    border: `4px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
-    outline: "none",
-    fontSize: 14,
-    transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
-    transform: isFocused ? "scale(1.02)" : "scale(1)",
-    boxShadow: isFocused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
-    background: "white",
-  };
-}
 
 function buttonStyle(disabled) {
   return {
