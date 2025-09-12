@@ -18,6 +18,7 @@ import SelectField from "../components/SelectField";
 import CheckboxField from "../components/CheckboxField";
 import Card from "../components/Card";
 import DateField from "../components/DateField";
+import SummbitButton from "../components/SummbitButton";
 
 
 const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
@@ -247,6 +248,7 @@ export default function Register({ width = 420 }) {
   );
 }
 
+
 function validate(f) {
   const errs = {};
   if (!f.name.trim()) errs.name = "El nombre es obligatorio.";
@@ -324,7 +326,7 @@ function toBackendPayload(form) {
 
 const styles = {
   page: {
-    minHeight: "100vh",
+    minHeight: "85vh",
     width: "100vw",
     backgroundImage: `url(${back})`,
     backgroundSize: "cover",
@@ -333,26 +335,8 @@ const styles = {
     display: "flex",
     justifyContent: "flex-end",
     alignItems: "flex-start",
-  padding: "40px 60px 0 0",
+  padding: "40px 60px 40px 0",
   backgroundAttachment: "fixed"
-  },
-  card: {
-    width: "100%", 
-    maxWidth: 550, 
-    minHeight: "100vh",
-    background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
-    paddingTop: 20,
-    paddingBottom: 40,
-    paddingLeft: 24,
-    paddingRight: 24, 
-    borderRadius: 12,
-    boxShadow: "0 10px 30px rgba(0,0,0,.2)",
-    fontFamily: "Montserrat",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
-    WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
   },
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
@@ -360,13 +344,16 @@ const styles = {
   meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
 };
 
-
-function buttonStyle(disabled) {
-  return {
-    marginTop: 12, width: "100%", padding: "12px 14px",
-    borderRadius: 10, border: "none",
-    background: disabled ? "#5fa1f2ff" : "#30a5e8ff",
-    color: "white", fontWeight: 600, cursor: disabled ? "not-allowed" : "pointer",
-    transition: "filter .2s"
-  };
-}
+const buttonStyle = disabled => ({
+    width: "100%",
+    marginTop: 18,
+    padding: "12px 0",
+    borderRadius: 10,
+    border: "none",
+    background: disabled ? "#cbd5e1" : "#2563eb",
+    color: disabled ? "#64748b" : "#fff",
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: disabled ? "not-allowed" : "pointer",
+    transition: "background .2s",
+  });

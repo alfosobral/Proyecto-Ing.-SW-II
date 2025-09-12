@@ -69,58 +69,6 @@ export default function LogIn() {
     return () => clearInterval(interval);
   }, []);
 
-  const buttonStyle = disabled => ({
-    width: "100%",
-    marginTop: 18,
-    padding: "12px 0",
-    borderRadius: 10,
-    border: "none",
-    background: disabled ? "#cbd5e1" : "#2563eb",
-    color: disabled ? "#64748b" : "#fff",
-    fontWeight: 700,
-    fontSize: 16,
-    cursor: disabled ? "not-allowed" : "pointer",
-    transition: "background .2s",
-  });
-
-  const styles = {
-	page: {
-	  minHeight: "100vh",
-	  width: "100vw",
-	  backgroundImage: `url(${back})`,
-	  backgroundSize: "cover",
-	  backgroundPosition: "center",
-	  backgroundRepeat: "no-repeat",
-	  display: "flex",
-	  justifyContent: "flex-end",
-	  alignItems: "flex-start",
-	padding: "40px 60px 0 0",
-	backgroundAttachment: "fixed"
-	},
-	card: {
-	  width: "100%", 
-	  maxWidth: 550, 
-	  minHeight: "100vh",
-	  background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
-	  paddingTop: 20,
-	  paddingBottom: 40,
-	  paddingLeft: 24,
-	  paddingRight: 24, 
-	  borderRadius: 12,
-	  boxShadow: "0 10px 30px rgba(0,0,0,.2)",
-	  fontFamily: "Montserrat",
-	  display: "flex",
-	  flexDirection: "column",
-	  alignItems: "center",
-	  backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
-	  WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
-	},
-	title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
-	meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
-	meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
-	meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
-  };
-
   return (
     <div style={styles.page}>
       <div className="bg-slideshow" aria-hidden>
@@ -169,6 +117,11 @@ export default function LogIn() {
             onChange={onChange}
           />
 
+		  <div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#bababaff" }}>
+				¿Aún no tienes una cuenta?{' '}
+				<a href="/register" style={{ color: "#30a5e8", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
+			</div>
+
           <button type="submit" disabled={!isValid} style={buttonStyle(!isValid)}>
             Iniciar sesión
           </button>
@@ -178,4 +131,33 @@ export default function LogIn() {
   );
 }
 
+  const buttonStyle = disabled => ({
+    width: "100%",
+    marginTop: 18,
+    padding: "12px 0",
+    borderRadius: 10,
+    border: "none",
+    background: disabled ? "#cbd5e1" : "#2563eb",
+    color: disabled ? "#64748b" : "#fff",
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: disabled ? "not-allowed" : "pointer",
+    transition: "background .2s",
+  });
 
+const styles = {
+  page: {
+    minHeight: "85vh",
+    width: "100vw",
+    backgroundImage: `url(${back})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+  padding: "40px 60px 40px 0",
+  backgroundAttachment: "fixed"
+  },
+  title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
+};

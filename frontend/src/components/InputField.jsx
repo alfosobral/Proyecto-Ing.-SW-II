@@ -50,7 +50,7 @@ export default function InputField({
         style={{
           width: "100%",
           padding: "10px 12px",
-          borderRadius: 10,
+          borderRadius: 12,
           border: `4px solid ${error ? "#ef4444" : focused ? "#2563eb" : "#cbd5e1"}`,
           outline: "none",
           fontSize: 14,
