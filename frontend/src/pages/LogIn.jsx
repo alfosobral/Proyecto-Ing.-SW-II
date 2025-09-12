@@ -1,166 +1,181 @@
+import React from "react";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import loginIm from "../assets/LogIn.png";
 import logo from "../assets/Logo.png";
+import Card from "../components/Card";
+import InputField from "../components/InputField";
+import PasswordField from "../components/PasswordField";
+import CheckboxField from "../components/CheckboxField";
+import back from "../assets/RegisterBackground.png";
+import back2 from "../assets/RegisterBackground2.png";
+import back3 from "../assets/RegisterBackground3.png";
+import back4 from "../assets/RegisterBackground4.png";
+import back5 from "../assets/RegisterBackground5.png";
+import back6 from "../assets/RegisterBackground6.png";
+import back7 from "../assets/RegisterBackground7.png";
+import back8 from "../assets/RegisterBackground8.png";
+
+const initial = { email: "", password: "", remember: false };
+
+  const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
 
 export default function LogIn() {
-	const [form, setForm] = useState({ email: "", password: "" });
-	const [error, setError] = useState("");
-	const [showPassword, setShowPassword] = useState(false);
-	const navigate = useNavigate();
-	const [touched, setTouched] = useState({});
-	const [focused, setFocused] = useState(null);
+  const [form, setForm] = React.useState(initial);
+  const [errors, setErrors] = React.useState({});
+  const [touched, setTouched] = React.useState({});
+  const [focused, setFocused] = React.useState(null);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [idx, setIdx] = React.useState(0);
+  const navigate = useNavigate();
 
-	function inputStyle(isError, isFocused) {
-		return {
-			width: "450px", 
-			maxWidth: "100%",
-			padding: "10px 12px",
-			borderRadius: 10,
-			border: `2px solid ${isError ? "#ef4444" : isFocused ? "#2563eb" : "#cbd5e1"}`,
-			outline: "none",
-			fontSize: 14,
-			transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
-			transform: isFocused ? "scale(1.02)" : "scale(1)",
-			boxShadow: isFocused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
-			background: "white",
-		};
-	}
+  const isValid = !Object.values(errors).some(Boolean) && form.email && form.password;
 
-	function onChange(e) {
-		const { name, value } = e.target;
-		setForm(f => ({ ...f, [name]: value }));
-	}
+  const onChange = e => {
+    const { name, value, type, checked } = e.target;
+    setForm(f => ({
+      ...f,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
-	function onBlur(e) {
-	    setTouched(t => ({ ...t, [e.target.name]: true }));
-  	}
+  const onBlur = e => {
+    setTouched(t => ({ ...t, [e.target.name]: true }));
+  };
 
-	function onSubmit(e) {
-		e.preventDefault();
-		if (!form.email || !form.password) {
-			setError("Completa ambos campos");
-			return;
-		}
-		setError("");
-		// Aca va la logica de autenticacion
-	    alert("Inicio de sesión enviado (ver consola)");
-	    console.log("LogIn:", form);
-	    navigate("/main_page");
-	}
+  const togglePassword = () => setShowPassword(v => !v);
 
-		return (
-			<div style={styles.page}>
-				<form onSubmit={onSubmit} style={styles.card}>
-					<img src={logo} alt="Logo Hurry Hand" width={120} style={{ marginBottom: 10 }} />
-					<h1 style={styles.title}>Iniciar sesión</h1>
-					<div style={styles.field}>
-						<label style={styles.label} htmlFor="email">Email</label>
-						<input
-							id="email"
-							name="email"
-							value={form.email}
-							onChange={onChange}
-							onBlur={onBlur}
-							onFocus={() => setFocused("email")}
-							onBlurCapture={() => setFocused(null)}
-							style={inputStyle(touched.email && !form.email, focused === "email")}
-							placeholder="tu@email.com"
-						/>
-						{touched.email && !form.email && <p style={styles.error}>El email es obligatorio</p>}
-					</div>
-					<div style={styles.field}>
-						<label style={styles.label} htmlFor="password">Contraseña</label>
-						<div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-							<input
-								id="password"
-								name="password"
-								type={showPassword ? "text" : "password"}
-								value={form.password}
-								onChange={onChange}
-								onBlur={onBlur}
-								onFocus={() => setFocused("password")}
-								onBlurCapture={() => setFocused(null)}
-								style={{ ...inputStyle(touched.password && !form.password, focused === "password"), paddingRight: 36 }}
-								placeholder="••••••••"
-							/>
-							<span
-								onClick={() => setShowPassword(s => !s)}
-								style={{ position: "absolute", right: 10, top: 0, bottom: 0, display: "flex", alignItems: "center", cursor: "pointer", color: "#bababaff", fontSize: 20 }}
-							>
-								{showPassword ? <FaEyeSlash /> : <FaEye />}
-							</span>
-						</div>
-						{touched.password && !form.password && <p style={styles.error}>La contraseña es obligatoria</p>}
-					</div>
-							{error && <p style={styles.error}>{error}</p>}
-							<div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#bababaff" }}>
-								¿Aún no tienes una cuenta?{' '}
-								<a href="/register" style={{ color: "#30a5e8", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
-							</div>
-							<button type="submit" style={styles.button}>Ingresar</button>
-				</form>
-			</div>
-		);
-}
+  React.useEffect(() => {
+    const errs = {};
+    if (!form.email) errs.email = "El email es obligatorio.";
+    else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)) errs.email = "Email inválido.";
+    if (!form.password) errs.password = "La contraseña es obligatoria.";
+    setErrors(errs);
+  }, [form]);
 
-    const styles = {
+  const onSubmit = e => {
+    e.preventDefault();
+    setTouched({ email: true, password: true });
+    if (isValid) {
+      // Aquí va la lógica de login
+      alert("¡Login exitoso!");
+      navigate("/main_page");
+    }
+  };
+
+  React.useEffect(() => {
+    const interval = setInterval(() => setIdx(i => (i + 1) % backgrounds.length), 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const buttonStyle = disabled => ({
+    width: "100%",
+    marginTop: 18,
+    padding: "12px 0",
+    borderRadius: 10,
+    border: "none",
+    background: disabled ? "#cbd5e1" : "#2563eb",
+    color: disabled ? "#64748b" : "#fff",
+    fontWeight: 700,
+    fontSize: 16,
+    cursor: disabled ? "not-allowed" : "pointer",
+    transition: "background .2s",
+  });
+
+  const styles = {
 	page: {
-		minHeight: "100vh",
-		width: "100vw",
-		backgroundImage: `url(${loginIm})`,
-		backgroundSize: "cover",
-		backgroundPosition: "center",
-		backgroundRepeat: "no-repeat",
-		backgroundAttachment: "fixed",
-		display: "flex",
-		alignItems: "center",
-		justifyContent: "center"
-	},  
+	  minHeight: "100vh",
+	  width: "100vw",
+	  backgroundImage: `url(${back})`,
+	  backgroundSize: "cover",
+	  backgroundPosition: "center",
+	  backgroundRepeat: "no-repeat",
+	  display: "flex",
+	  justifyContent: "flex-end",
+	  alignItems: "flex-start",
+	padding: "40px 60px 0 0",
+	backgroundAttachment: "fixed"
+	},
 	card: {
-		width: "100%", 
-		maxWidth: 550, 
-		minHeight: "100vh",
-		background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
-		paddingTop: 20,
-		paddingBottom: 40,
-		paddingLeft: 24,
-		paddingRight: 24, 
-		borderRadius: 12,
-		boxShadow: "0 10px 30px rgba(0,0,0,.2)",
-		fontFamily: "Montserrat",
-		display: "flex",
-		flexDirection: "column",
-		alignItems: "center",
-		backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
-		WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
+	  width: "100%", 
+	  maxWidth: 550, 
+	  minHeight: "100vh",
+	  background: "rgba(15, 16, 26, 0.35)", // Fondo más transparente
+	  paddingTop: 20,
+	  paddingBottom: 40,
+	  paddingLeft: 24,
+	  paddingRight: 24, 
+	  borderRadius: 12,
+	  boxShadow: "0 10px 30px rgba(0,0,0,.2)",
+	  fontFamily: "Montserrat",
+	  display: "flex",
+	  flexDirection: "column",
+	  alignItems: "center",
+	  backdropFilter: "blur(16px)", // <-- Agrega el blur aquí
+	  WebkitBackdropFilter: "blur(16px)", // Para compatibilidad con Safari
 	},
-	title: { margin: 0, marginBottom: 20, fontSize: 28, color: "#fff", textAlign: "center" },
-	field: { marginBottom: 18, width: "100%" },
-	label: { fontSize: 14, color: "#bababaff", marginBottom: 6, display: "block" },
-	error: { color: "#dc2626", fontSize: 13, marginTop: 6 },
-	input: {
-		width: "100%",
-		padding: "10px 12px",
-		borderRadius: 10,
-		border: "2px solid #cbd5e1",
-		outline: "none",
-		fontSize: 14,
-		background: "white"
-	},
-	button: {
-		marginTop: 12,
-		width: "100%",
-		padding: "12px 14px",
-		borderRadius: 10,
-		border: "none",
-		background: "#30a5e8ff",
-		color: "white",
-		fontWeight: 600,
-		cursor: "pointer",
-		fontSize: 16
-	}
-};
+	title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
+	meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
+	meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
+	meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
+  };
+
+  return (
+    <div style={styles.page}>
+      <div className="bg-slideshow" aria-hidden>
+        {backgrounds.map((src, i) => (
+          <img key={i} src={src} alt="" className={`bg-slide ${i === idx ? "is-active" : ""}`} />
+        ))}
+        <div className="bg-vignette" />
+      </div>
+      <Card style={{ zIndex: 10 }}>
+        <form onSubmit={onSubmit}>
+          <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto" }} />
+          <h1 style={styles.title}>Iniciar sesión</h1>
+
+          <InputField
+            id="email"
+            label="Email"
+            name="email"
+            value={form.email}
+            onChange={onChange}
+            onBlur={onBlur}
+            onFocus={() => setFocused("email")}
+            placeholder="tu@email.com"
+            error={errors.email}
+            touched={touched.email}
+          />
+
+          <PasswordField
+            id="password"
+            label="Contraseña"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            onBlur={onBlur}
+            onFocus={() => setFocused("password")}
+            placeholder="••••••••"
+            error={errors.password}
+            touched={touched.password}
+            showPassword={showPassword}
+            togglePassword={togglePassword}
+          />
+
+          <CheckboxField
+            id="remember"
+            label="Recordarme"
+            checked={form.remember}
+            onChange={onChange}
+          />
+
+          <button type="submit" disabled={!isValid} style={buttonStyle(!isValid)}>
+            Iniciar sesión
+          </button>
+        </form>
+      </Card>
+    </div>
+  );
+}
 
 
