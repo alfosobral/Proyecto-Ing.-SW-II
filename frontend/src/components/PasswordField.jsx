@@ -11,8 +11,8 @@ export default function PasswordField({
   placeholder,
   error,
   touched,
-  showPassword,
-  togglePassword,
+  show = flase,
+  onToggle,
   ...props
 }) {
   const [focused, setFocused] = React.useState(false);
@@ -43,7 +43,7 @@ export default function PasswordField({
         <input
           id={id}
           name={id}
-          type={showPassword ? "text" : "password"}
+          type={show ? "text" : "password"}
           value={value}
           onChange={onChange}
           onBlur={handleBlur}
@@ -66,7 +66,7 @@ export default function PasswordField({
         />
         <button
           type="button"
-          onClick={togglePassword}
+          onClick={onToggle}
           tabIndex={-1}
           style={{
             position: "absolute",
@@ -83,9 +83,9 @@ export default function PasswordField({
             display: "flex",
             alignItems: "center",
           }}
-          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+          aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
         >
-          {showPassword ? <FaEyeSlash /> : <FaEye />}
+          {show ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
       {touched && error && (

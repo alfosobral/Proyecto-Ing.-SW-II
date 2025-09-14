@@ -21,14 +21,18 @@ import DateField from "../components/DateField";
 import SummbitButton from "../components/SummbitButton";
 
 
-const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phone: "", accept: false };
+const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phoneNumber: "", accept: false };
 
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
   const [touched, setTouched] = useState({});
   const [focused, setFocused] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm]   = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const [serverErrors, setServerErrors] = useState({});
 
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
@@ -43,27 +47,116 @@ export default function Register({ width = 420 }) {
   function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
+    setServerErrors(se => (se[name] ? { ...se, [name]: undefined } : se));
   }
 
   function onBlur(e) {
     setTouched(t => ({ ...t, [e.target.name]: true }));
   }
 
-  function onSubmit(e) {
+ {/* async function onSubmit(e) {
     e.preventDefault();
-    if (!isValid) return;
+    if (!isValid) alert("Por favor, corrige los errores del formulario.");
     const payload = toBackendPayload(form);
-    console.log("Payload para backend:", payload);
-    // fetch/axios aquí con payload
-    alert("✅ Registro enviado (ver consola)");
-    navigate("/login");
+    const body = JSON.stringify(payload);
+    const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+    alert(body); // solo para ver el payload
+    try {
+    const res = await fetch(`${API}/api/user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text(); // <-- lee texto aunque no sea JSON
+      console.error("Respuesta 400:", text);
+      throw new Error(text || `Error ${res.status}`);
+    }
+  } catch (err) {
+    console.error(" Error al registrar:", err);
+  }
+}
+*/}
+
+async function onSubmit(e) {
+  e.preventDefault();
+  if (!isValid) {
+    setTouched(t => ({
+      ...t,
+      name:true, surname:true, document:true, phoneNumber:true,
+      email:true, password:true, confirm:true, birthDate:true
+    }));
+    return;
   }
 
-  const strength = passwordStrength(form.password);
+  setLoading(true);
+  const payload = toBackendPayload(form);
+  const API = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 
-   const togglePassword = () => {
-    setShowPassword(!showPassword);
-  };
+  try {
+    const res = await fetch(`${API}/api/user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text(); // puede venir JSON o texto
+      let data = null;
+      try { data = JSON.parse(text); } catch { /* queda null */ }
+
+      // 1) Caso esperado en tu back: { validationErrors: { campo: "mensaje", ... }, message: "..."}
+      // 2) Otros formatos comunes: { errors: [{field:"email", message:"..."}], message:"..."}
+      const mapped = {};
+
+      if (data?.validationErrors && typeof data.validationErrors === "object") {
+        Object.assign(mapped, data.validationErrors);
+      } else if (Array.isArray(data?.errors)) {
+        for (const e of data.errors) {
+          if (e.field && e.message) mapped[e.field] = e.message;
+        }
+      } else if (data?.message) {
+        // heurística: si el mensaje menciona email duplicado, lo mapeamos a email
+        if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
+          mapped.email = data.message;
+        } else {
+          mapped._general = data.message; // por si querés mostrar un error general
+        }
+      } else if (text) {
+        // si vino texto plano
+        if (/mail|correo/i.test(text) && /existe|registrad/i.test(text)) {
+          mapped.email = text;
+        } else {
+          mapped._general = text;
+        }
+      }
+
+      // marcar como touched los campos que tengan error del server
+      if (Object.keys(mapped).length) {
+        setServerErrors(mapped);
+        setTouched(t => {
+          const next = { ...t };
+          for (const k of Object.keys(mapped)) next[k] = true;
+          return next;
+        });
+      }
+
+      throw new Error(data?.message || text || `Error ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("Signup OK:", data);
+    alert(`✅ Registro creado para ${data.email ?? payload.email}`);
+    navigate("/login");
+  } catch (err) {
+    console.error("Error al registrar:", err);
+  } finally {
+    setLoading(false);
+  }
+}
+
+  const strength = passwordStrength(form.password);
 
   const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
   const [idx, setIdx] = useState(0);
@@ -101,8 +194,8 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("name")}
         placeholder="Tu nombre"
-        error={errors.name}
-        touched={touched.name}
+        error={errors.name || serverErrors.name}
+        touched={touched.name || !!serverErrors.name}
       />
 
       {/* Apellido */}
@@ -114,6 +207,8 @@ export default function Register({ width = 420 }) {
         onChange={onChange} onBlur={onBlur}
         onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
         placeholder="Tu apellido"
+        error={errors.surname || serverErrors.surname}
+        touched={touched.surname || !!serverErrors.surname}
       />
 
       {/* Tipo de documento */}
@@ -128,6 +223,8 @@ export default function Register({ width = 420 }) {
           { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
           { value: "Otro", label: "Otro" }
         ]}
+        error={errors.documentType || serverErrors.documentType}
+        touched={touched.documentType || !!serverErrors.documentType}
       />
 
       {/* Documento */}
@@ -148,6 +245,8 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
         placeholder="Documento"
+        error={errors.document || serverErrors.document}
+        touched={touched.document || !!serverErrors.document}
       />
 
       {/* Nacimiento */}
@@ -158,23 +257,25 @@ export default function Register({ width = 420 }) {
         onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
         onBlur={onBlur}
         onFocus={() => setFocused("birthDate")}
-        error={errors.birthDate}
-        touched={touched.birthDate}
+        error={errors.birthDate || serverErrors.birthDate}
+        touched={touched.birthDate || !!serverErrors.birthDate}
       />
 
       {/* Teléfono */}
       <InputField
-        id="phone" 
+        id="phoneNumber" 
         label="Teléfono"
-        name="phone" 
-        value={form.phone}
+        name="phoneNumber" 
+        value={form.phoneNumber}
         onChange={e => {
           const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
-          setForm(f => ({ ...f, phone: value }));
+          setForm(f => ({ ...f, phoneNumber: value }));
         }}
         onBlur={onBlur}
-        onFocus={() => setFocused("phone")} onBlurCapture={() => setFocused(null)}
+        onFocus={() => setFocused("phoneNumber")} onBlurCapture={() => setFocused(null)}
         placeholder="Teléfono"
+        error={errors.phoneNumber || serverErrors.phoneNumber}
+        touched={touched.phoneNumber || !!serverErrors.phoneNumber}
       />
 
       {/* Email */}
@@ -186,6 +287,8 @@ export default function Register({ width = 420 }) {
         onChange={onChange} onBlur={onBlur}
         onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
         placeholder="tu@email.com"
+        error={errors.email || serverErrors.email}
+        touched={touched.email || !!serverErrors.email}
       />
 
       {/* Password */}
@@ -197,10 +300,10 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("password")}
         placeholder="••••••••"
-        error={errors.password}
-        touched={touched.password}
-        showPassword={showPassword}
-        togglePassword={togglePassword}
+        show={showPassword}
+        onToggle={() => setShowPassword(s => !s)}
+        error={errors.password || serverErrors.password}
+        touched={touched.password || !!serverErrors.password}
       />
       <div>
         <div style={styles.meterWrap} aria-hidden>
@@ -210,15 +313,19 @@ export default function Register({ width = 420 }) {
       </div>
 
       {/* Confirm */}
-      <InputField
+      <PasswordField
         id="confirm" 
         label="Confirmar contraseña"
         name="confirm" 
-        type="password"
         value={form.confirm} 
-        onChange={onChange} onBlur={onBlur}
-        onFocus={() => setFocused("confirm")} onBlurCapture={() => setFocused(null)}
+        onChange={onChange} 
+        onBlur={onBlur}
+        onFocus={() => setFocused("confirm")} 
         placeholder="Repite la contraseña"
+        show={showConfirm}
+        onToggle={() => setShowConfirm(s => !s)}
+        error={errors.confirm || serverErrors.confirm}
+        touched={touched.confirm || !!serverErrors.confirm}
       />
 
       {/* Términos */}
@@ -239,15 +346,18 @@ export default function Register({ width = 420 }) {
         >Iniciar sesión</a>
       </div>
 
-      <button type="submit" disabled={!isValid} style={buttonStyle(!isValid)} >
-        Crear cuenta
+      <button
+        type="submit"
+        disabled={!isValid || loading}
+        style={buttonStyle(!isValid || loading)}
+      >
+        {loading ? "Enviando..." : "Crear cuenta"}
       </button>
     </form>
     </Card>
     </div>
   );
 }
-
 
 function validate(f) {
   const errs = {};
@@ -258,7 +368,7 @@ function validate(f) {
       ? "El documento debe tener 8 dígitos numéricos."
       : "El documento es obligatorio (alfanumérico, mínimo 4 caracteres).";
   }
-  if (!isValidPhone(f.phone)) errs.phone = "Teléfono inválido (9 dígitos).";
+  if (!isValidPhone(f.phoneNumber)) errs.phoneNumber = "Teléfono inválido (9 dígitos).";
   if (!isValidEmail(f.email)) errs.email = "Email inválido.";
   if (f.password.length < 8) errs.password = "Mínimo 8 caracteres.";
   if (!/[A-Z]/.test(f.password)) errs.password ??= "Incluye al menos una mayúscula.";
@@ -316,6 +426,7 @@ function toBackendPayload(form) {
     password: form.password,
     name: form.name,
     surname: form.surname,
+    phoneNumber: form.phoneNumber,
     personalId: form.document,
     personalIdType: form.documentType === "Cedula Uruguaya" ? "DNI_URUGUAYO" : "OTRO",
     birthdate: form.birthDate

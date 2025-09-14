@@ -106,8 +106,8 @@ export default function LogIn() {
             placeholder="••••••••"
             error={errors.password}
             touched={touched.password}
-            showPassword={showPassword}
-            togglePassword={togglePassword}
+            show={showPassword}
+            onToggle={togglePassword}
           />
 
           <CheckboxField

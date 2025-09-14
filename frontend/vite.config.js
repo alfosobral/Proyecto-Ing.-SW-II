@@ -9,7 +9,7 @@ export default defineConfig({
     port: 5173,     // puerto por defecto de Vite
     proxy: {
       '/api': {
-        target: 'http://backend:8080', // el servicio "backend" en docker-compose
+        target: 'http://localhost:8080', // el servicio "backend" en docker-compose
         changeOrigin: true,
       },
     },
