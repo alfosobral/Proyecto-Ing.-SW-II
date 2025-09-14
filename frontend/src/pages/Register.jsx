@@ -37,12 +37,10 @@ export default function Register({ width = 420 }) {
   const errors = useMemo(() => validate(form), [form]);
   const isValid = Object.keys(errors).length === 0 && form.accept;
 
-  function maxAdultDate() {
-  const t = new Date();
-  t.setHours(0, 0, 0, 0);
-  t.setFullYear(t.getFullYear() - 18);
-  return t;
-}
+  const strength = passwordStrength(form.password);
+
+  const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
+  const [idx, setIdx] = useState(0);
 
   function onChange(e) {
     const { name, type, value, checked } = e.target;
@@ -54,112 +52,71 @@ export default function Register({ width = 420 }) {
     setTouched(t => ({ ...t, [e.target.name]: true }));
   }
 
- {/* async function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
-    if (!isValid) alert("Por favor, corrige los errores del formulario.");
+    if (!isValid) {
+      setTouched(t => ({
+        ...t,
+        name:true, surname:true, document:true, phoneNumber:true,
+        email:true, password:true, confirm:true, birthDate:true
+      }));
+      return;
+    }
+
+    setLoading(true);
     const payload = toBackendPayload(form);
-    const body = JSON.stringify(payload);
-    const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
-    alert(body); // solo para ver el payload
+    const API = import.meta.env.VITE_API_URL;
+
     try {
-    const res = await fetch(`${API}/api/user`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      const res = await fetch(`${API}/api/user`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) {
-      const text = await res.text(); // <-- lee texto aunque no sea JSON
-      console.error("Respuesta 400:", text);
-      throw new Error(text || `Error ${res.status}`);
-    }
-  } catch (err) {
-    console.error(" Error al registrar:", err);
-  }
-}
-*/}
+      if (!res.ok) {
+        const text = await res.text(); // puede venir JSON o texto
+        let data = null;
+        try { data = JSON.parse(text); } catch { /* queda null */ }
 
-async function onSubmit(e) {
-  e.preventDefault();
-  if (!isValid) {
-    setTouched(t => ({
-      ...t,
-      name:true, surname:true, document:true, phoneNumber:true,
-      email:true, password:true, confirm:true, birthDate:true
-    }));
-    return;
-  }
+        const mapped = {};
 
-  setLoading(true);
-  const payload = toBackendPayload(form);
-  const API = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+        if (data?.validationErrors && typeof data.validationErrors === "object") {
+          Object.assign(mapped, data.validationErrors);
+        } else if (Array.isArray(data?.errors)) {
+          for (const e of data.errors) {
+            if (e.field && e.message) mapped[e.field] = e.message;
+          }
+        } else if (data?.message) {
+          if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
+            mapped.email = data.message;
+          } else {
+            mapped._general = data.message; // por si querés mostrar un error general
+          }
+        } 
 
-  try {
-    const res = await fetch(`${API}/api/user`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const text = await res.text(); // puede venir JSON o texto
-      let data = null;
-      try { data = JSON.parse(text); } catch { /* queda null */ }
-
-      // 1) Caso esperado en tu back: { validationErrors: { campo: "mensaje", ... }, message: "..."}
-      // 2) Otros formatos comunes: { errors: [{field:"email", message:"..."}], message:"..."}
-      const mapped = {};
-
-      if (data?.validationErrors && typeof data.validationErrors === "object") {
-        Object.assign(mapped, data.validationErrors);
-      } else if (Array.isArray(data?.errors)) {
-        for (const e of data.errors) {
-          if (e.field && e.message) mapped[e.field] = e.message;
+        // marcar como touched los campos que tengan error del server
+        if (Object.keys(mapped).length) {
+          setServerErrors(mapped);
+          setTouched(t => {
+            const next = { ...t };
+            for (const k of Object.keys(mapped)) next[k] = true;
+            return next;
+          });
         }
-      } else if (data?.message) {
-        // heurística: si el mensaje menciona email duplicado, lo mapeamos a email
-        if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
-          mapped.email = data.message;
-        } else {
-          mapped._general = data.message; // por si querés mostrar un error general
-        }
-      } else if (text) {
-        // si vino texto plano
-        if (/mail|correo/i.test(text) && /existe|registrad/i.test(text)) {
-          mapped.email = text;
-        } else {
-          mapped._general = text;
-        }
+
+        throw new Error(data?.message || text || `Error ${res.status}`);
       }
 
-      // marcar como touched los campos que tengan error del server
-      if (Object.keys(mapped).length) {
-        setServerErrors(mapped);
-        setTouched(t => {
-          const next = { ...t };
-          for (const k of Object.keys(mapped)) next[k] = true;
-          return next;
-        });
-      }
-
-      throw new Error(data?.message || text || `Error ${res.status}`);
+      const data = await res.json();
+      console.log("Signup OK:", data);
+      navigate("/login");
+    } catch (err) {
+      console.error("Error al registrar:", err);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    console.log("Signup OK:", data);
-    alert(`✅ Registro creado para ${data.email ?? payload.email}`);
-    navigate("/login");
-  } catch (err) {
-    console.error("Error al registrar:", err);
-  } finally {
-    setLoading(false);
   }
-}
-
-  const strength = passwordStrength(form.password);
-
-  const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
-  const [idx, setIdx] = useState(0);
 
    useEffect(() => {
     backgrounds.forEach(src => { const i = new Image(); i.src = src; });
