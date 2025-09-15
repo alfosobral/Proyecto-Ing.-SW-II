@@ -50,7 +50,7 @@ export default function DateField({
           width: "100%",
           padding: "10px 12px",
           borderRadius: 10,
-          border: `4px solid ${error ? "#ef4444" : focused ? "#2563eb" : "#cbd5e1"}`,
+          border: `4px solid ${error ? "#ef4444" : focused ? "#42b3fd" : "#cbd5e1"}`,
           outline: "none",
           fontSize: 14,
           transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",

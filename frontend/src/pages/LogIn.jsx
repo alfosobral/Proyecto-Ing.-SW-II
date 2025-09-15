@@ -101,7 +101,7 @@ export default function LogIn() {
 
       const data = await res.json();
       console.log("Signup OK:", data);
-      navigate("/main_page");
+      navigate("/home_page");
     } catch (err) {
       console.error("Error al registrar:", err);
     } finally {
@@ -171,7 +171,7 @@ export default function LogIn() {
 
 		  <div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#bababaff" }}>
 				¿Aún no tienes una cuenta?{' '}
-				<a href="/register" style={{ color: "#30a5e8", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
+				<a href="/register" style={{ color: "#42b3fd", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
 			</div>
 
       <button
@@ -211,7 +211,7 @@ function toBackendPayload(form) {
     padding: "12px 0",
     borderRadius: 10,
     border: "none",
-    background: disabled ? "#cbd5e1" : "#2563eb",
+    background: disabled ? "#cbd5e1" : "#42b3fd",
     color: disabled ? "#64748b" : "#fff",
     fontWeight: 700,
     fontSize: 16,

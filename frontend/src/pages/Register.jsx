@@ -1,7 +1,5 @@
 import { useState, useMemo , useEffect} from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import logo from "../assets/Logo.png";
 import back from "../assets/RegisterBackground.png";
@@ -18,7 +16,6 @@ import SelectField from "../components/SelectField";
 import CheckboxField from "../components/CheckboxField";
 import Card from "../components/Card";
 import DateField from "../components/DateField";
-import SummbitButton from "../components/SummbitButton";
 
 
 const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phoneNumber: "", accept: false };
@@ -408,7 +405,7 @@ const styles = {
   },
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
-  meterBar: { height: "100%", background: "#3b82f6", borderRadius: 999, transition: "width .25s" },
+  meterBar: { height: "100%", background: "#42b3fd", borderRadius: 999, transition: "width .25s" },
   meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
 };
 
@@ -418,7 +415,7 @@ const buttonStyle = disabled => ({
     padding: "12px 0",
     borderRadius: 10,
     border: "none",
-    background: disabled ? "#cbd5e1" : "#2563eb",
+    background: disabled ? "#cbd5e1" : "#42b3fd",
     color: disabled ? "#64748b" : "#fff",
     fontWeight: 700,
     fontSize: 16,

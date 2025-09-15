@@ -1,6 +1,9 @@
 import Navbar from "../components/Navbar";
+import React from "react";
+import Card from "../components/Card";
 
-export default function MainPage() {
+
+export default function HomePage() {
     return (
         <div 
             style={{ 
@@ -8,7 +11,8 @@ export default function MainPage() {
                 display: "flex",
                 alignItems: "flex-start",
                 padding: "40px 0",
-                background: "#051f65ff" 
+                background: "#00040eff" 
+                //background: "#fff   "
             }}
        >
             <Navbar />
