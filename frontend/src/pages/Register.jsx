@@ -28,21 +28,31 @@ export default function Register({ width = 420 }) {
   const [showConfirm, setShowConfirm]   = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false); 
 
   const [serverErrors, setServerErrors] = useState({});
-
-  const errors = useMemo(() => validate(form), [form]);
-  const isValid = Object.keys(errors).length === 0 && form.accept;
+  
+  const rawErrors = useMemo(() => validate(form), [form]);
+  const isValid = Object.keys(rawErrors).length === 0 && form.accept;
 
   const strength = passwordStrength(form.password);
 
   const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
   const [idx, setIdx] = useState(0);
 
+  const getFieldError = (name) => {
+    const hasBeenInteracted = touched[name] || submitted; // 👈 solo si tocado o se intentó enviar
+    if (!hasBeenInteracted) return undefined;
+    return serverErrors[name] || rawErrors[name];
+  };
+
   function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
+    // Si viene error del server para ese campo, lo limpio al modificar
     setServerErrors(se => (se[name] ? { ...se, [name]: undefined } : se));
+    // (Opcional) marcar como touched al primer cambio
+    if (!touched[name]) setTouched(t => ({ ...t, [name]: true }));
   }
 
   function onBlur(e) {
@@ -51,6 +61,7 @@ export default function Register({ width = 420 }) {
 
   async function onSubmit(e) {
     e.preventDefault();
+    setSubmitted(true);
     if (!isValid) {
       setTouched(t => ({
         ...t,
@@ -148,8 +159,8 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("name")}
         placeholder="Tu nombre"
-        error={errors.name || serverErrors.name}
-        touched={touched.name || !!serverErrors.name}
+        error={getFieldError("name")}
+        touched={touched.name || !!serverErrors.name || submitted}
       />
 
       {/* Apellido */}
@@ -161,8 +172,8 @@ export default function Register({ width = 420 }) {
         onChange={onChange} onBlur={onBlur}
         onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
         placeholder="Tu apellido"
-        error={errors.surname || serverErrors.surname}
-        touched={touched.surname || !!serverErrors.surname}
+        error={getFieldError("surname")}
+        touched={touched.surname || !!serverErrors.surname || submitted}
       />
 
       {/* Tipo de documento */}
@@ -177,8 +188,8 @@ export default function Register({ width = 420 }) {
           { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
           { value: "Otro", label: "Otro" }
         ]}
-        error={errors.documentType || serverErrors.documentType}
-        touched={touched.documentType || !!serverErrors.documentType}
+        error={getFieldError("documentType")}
+        touched={touched.documentType || !!serverErrors.documentType || submitted}
       />
 
       {/* Documento */}
@@ -199,8 +210,8 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
         placeholder="Documento"
-        error={errors.document || serverErrors.document}
-        touched={touched.document || !!serverErrors.document}
+        error={getFieldError("document")}
+        touched={touched.document || !!serverErrors.document || submitted}
       />
 
       {/* Nacimiento */}
@@ -211,8 +222,8 @@ export default function Register({ width = 420 }) {
         onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
         onBlur={onBlur}
         onFocus={() => setFocused("birthDate")}
-        error={errors.birthDate || serverErrors.birthDate}
-        touched={touched.birthDate || !!serverErrors.birthDate}
+        error={getFieldError("birthDate")}
+        touched={touched.birthDate || !!serverErrors.birthDate || submitted}
       />
 
       {/* Teléfono */}
@@ -228,8 +239,8 @@ export default function Register({ width = 420 }) {
         onBlur={onBlur}
         onFocus={() => setFocused("phoneNumber")} onBlurCapture={() => setFocused(null)}
         placeholder="Teléfono"
-        error={errors.phoneNumber || serverErrors.phoneNumber}
-        touched={touched.phoneNumber || !!serverErrors.phoneNumber}
+        error={getFieldError("phoneNumber")}
+        touched={touched.phoneNumber || !!serverErrors.phoneNumber || submitted}
       />
 
       {/* Email */}
@@ -241,8 +252,8 @@ export default function Register({ width = 420 }) {
         onChange={onChange} onBlur={onBlur}
         onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
         placeholder="tu@email.com"
-        error={errors.email || serverErrors.email}
-        touched={touched.email || !!serverErrors.email}
+        error={getFieldError("email")}
+        touched={touched.email || !!serverErrors.email || submitted}
       />
 
       {/* Password */}
@@ -256,8 +267,8 @@ export default function Register({ width = 420 }) {
         placeholder="••••••••"
         show={showPassword}
         onToggle={() => setShowPassword(s => !s)}
-        error={errors.password || serverErrors.password}
-        touched={touched.password || !!serverErrors.password}
+        error={getFieldError("password")}
+        touched={touched.password || !!serverErrors.password || submitted}
       />
       <div>
         <div style={styles.meterWrap} aria-hidden>
@@ -278,8 +289,8 @@ export default function Register({ width = 420 }) {
         placeholder="Repite la contraseña"
         show={showConfirm}
         onToggle={() => setShowConfirm(s => !s)}
-        error={errors.confirm || serverErrors.confirm}
-        touched={touched.confirm || !!serverErrors.confirm}
+        error={getFieldError("confirm")}
+        touched={touched.confirm || !!serverErrors.confirm || submitted}
       />
 
       {/* Términos */}

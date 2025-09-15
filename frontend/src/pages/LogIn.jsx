@@ -23,20 +23,33 @@ export default function LogIn() {
   const [form, setForm] = React.useState(initial);
   const [serverErrors, setServerErrors] = useState({});
   const [touched, setTouched] = React.useState({});
+  const [submitted, setSubmitted] = useState(false); 
   const [focused, setFocused] = React.useState(null);
   const [showPassword, setShowPassword] = React.useState(false);
   const [idx, setIdx] = React.useState(0);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const errors = useMemo(() => validate(form), [form]);
+  const rawErrors = useMemo(() => validate(form), [form]);
 
-  const isValid = !Object.values(errors).some(Boolean) && form.email && form.password;
+  const getFieldError = (name) => {
+    const hasBeenInteracted = touched[name] || submitted; // 👈 solo si tocado o se intentó enviar
+    if (!hasBeenInteracted) return undefined;
+    return serverErrors[name] || rawErrors[name];
+  };
+
+  const isValid =
+    form.email &&
+    form.password &&
+    !Object.values(rawErrors).some(Boolean);
 
    function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
+    // Si viene error del server para ese campo, lo limpio al modificar
     setServerErrors(se => (se[name] ? { ...se, [name]: undefined } : se));
+    // (Opcional) marcar como touched al primer cambio
+    if (!touched[name]) setTouched(t => ({ ...t, [name]: true }));
   }
 
   const onBlur = e => {
@@ -44,7 +57,8 @@ export default function LogIn() {
   };
 
   async function onSubmit(e) {
-    e.preventDefault();
+    e.preventDefault()
+    setSubmitted(true);
     if (!isValid) {
       setTouched(t => ({
         ...t,
@@ -142,8 +156,8 @@ export default function LogIn() {
             onBlur={onBlur}
             onFocus={() => setFocused("email")}
             placeholder="tu@email.com"
-            error={errors.email || serverErrors.email}
-            touched={touched.email || !!serverErrors.email}
+            error={getFieldError("email")}
+            touched={touched.email || !!serverErrors.email || submitted}
           />
 
 
@@ -158,8 +172,8 @@ export default function LogIn() {
             placeholder="••••••••"
             show={showPassword}
             onToggle={() => setShowPassword(s => !s)}
-            error={errors.password || serverErrors.password}
-            touched={touched.password || !!serverErrors.password}
+            error={getFieldError("password")}
+            touched={touched.password || !!serverErrors.password || submitted}
           />
 
           <CheckboxField

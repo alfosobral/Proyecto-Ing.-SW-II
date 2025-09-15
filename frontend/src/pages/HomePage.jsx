@@ -1,9 +1,12 @@
 import Navbar from "../components/Navbar";
 import React from "react";
 import Card from "../components/Card";
+import InputField from "../components/InputField";
+import ServiceCard from "../components/ServiceCard";
 
 
 export default function HomePage() {
+
     return (
         <div 
             style={{ 
@@ -16,7 +19,10 @@ export default function HomePage() {
             }}
        >
             <Navbar />
+                
        </div>
+
+       
 
     );
 
