@@ -10,7 +10,6 @@ export default function DateField({
   placeholder,
   error,
   touched,
-  style,
   ...props
 }) {
   const [focused, setFocused] = React.useState(false);

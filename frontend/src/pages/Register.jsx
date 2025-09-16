@@ -98,6 +98,8 @@ export default function Register({ width = 420 }) {
         } else if (data?.message) {
           if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
             mapped.email = data.message;
+          } else if ((/teléfono/i.test(data.message) && /existe/i.test(data.message))) {
+            mapped.phoneNumber = data.message;
           } else {
             mapped._general = data.message; 
           }
@@ -227,10 +229,12 @@ export default function Register({ width = 420 }) {
           />
 
           {/* Teléfono */}
-        <div style={styles.field}>
-          <label style={styles.label}>Teléfono</label>
           <PhoneField
-            value={phoneValue}
+            id="phoneNumber"
+            label="Teléfono"
+            value={form.phoneNumber.replace(countryCode, "")}
+            name="phoneNumber"
+            placeholder={"Teléfono"}
             onChange={e => {
               const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 12);
               setPhoneValue(val);
@@ -241,13 +245,8 @@ export default function Register({ width = 420 }) {
               setCountryCode(code);
               setForm(f => ({ ...f, phoneNumber: code + phoneValue }));
             }}
-            name="phoneNumber"
             onBlur={onBlur}
           />
-          {touched.phoneNumber && getFieldError("phoneNumber") && (
-            <p style={styles.error}>{getFieldError("phoneNumber")}</p>
-          )}
-        </div>
 
           {/* Email */}
           <InputField
