@@ -46,9 +46,7 @@ export default function LogIn() {
    function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
-    // Si viene error del server para ese campo, lo limpio al modificar
     setServerErrors(se => (se[name] ? { ...se, [name]: undefined } : se));
-    // (Opcional) marcar como touched al primer cambio
     if (!touched[name]) setTouched(t => ({ ...t, [name]: true }));
   }
 
@@ -100,7 +98,7 @@ export default function LogIn() {
             mapped.password = "Contraseña incorrecta"; // por si querés mostrar un error general
           }
         } 
-        // marcar como touched los campos que tengan error del server
+
         if (Object.keys(mapped).length) {
           setServerErrors(mapped);
           setTouched(t => {
@@ -114,7 +112,9 @@ export default function LogIn() {
       }
 
       const data = await res.json();
-      console.log("Signup OK:", data);
+      
+      
+
       navigate("/home_page");
     } catch (err) {
       console.error("Error al registrar:", err);

@@ -23,7 +23,6 @@ const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document
 export default function Register({ width = 420 }) {
   const [form, setForm] = useState(initial);
   const [touched, setTouched] = useState({});
-  const [focused, setFocused] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm]   = useState(false);
   const navigate = useNavigate();
@@ -41,7 +40,7 @@ export default function Register({ width = 420 }) {
   const [idx, setIdx] = useState(0);
 
   const getFieldError = (name) => {
-    const hasBeenInteracted = touched[name] || submitted; // 👈 solo si tocado o se intentó enviar
+    const hasBeenInteracted = touched[name] || submitted;
     if (!hasBeenInteracted) return undefined;
     return serverErrors[name] || rawErrors[name];
   };
@@ -49,9 +48,7 @@ export default function Register({ width = 420 }) {
   function onChange(e) {
     const { name, type, value, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === "checkbox" ? checked : value }));
-    // Si viene error del server para ese campo, lo limpio al modificar
     setServerErrors(se => (se[name] ? { ...se, [name]: undefined } : se));
-    // (Opcional) marcar como touched al primer cambio
     if (!touched[name]) setTouched(t => ({ ...t, [name]: true }));
   }
 
@@ -83,7 +80,7 @@ export default function Register({ width = 420 }) {
       });
 
       if (!res.ok) {
-        const text = await res.text(); // puede venir JSON o texto
+        const text = await res.text();
         let data = null;
         try { data = JSON.parse(text); } catch { /* queda null */ }
 
@@ -99,11 +96,10 @@ export default function Register({ width = 420 }) {
           if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
             mapped.email = data.message;
           } else {
-            mapped._general = data.message; // por si querés mostrar un error general
+            mapped._general = data.message; 
           }
         } 
 
-        // marcar como touched los campos que tengan error del server
         if (Object.keys(mapped).length) {
           setServerErrors(mapped);
           setTouched(t => {
@@ -138,188 +134,193 @@ export default function Register({ width = 420 }) {
 
   return (
     <div style={styles.page}>
-      {/* Slideshow de fondo (las clases están en index.css) */}
+
       <div className="bg-slideshow" aria-hidden>
         {backgrounds.map((src, i) => (
           <img key={i} src={src} alt="" className={`bg-slide ${i === idx ? "is-active" : ""}`} />
         ))}
         <div className="bg-vignette" />
       </div>
+
       <Card style={{ zIndex: 10 }}>
-      <form onSubmit={onSubmit}>
-      <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
-      <h1 style={styles.title}>¡Bienvenido a Hurry Hand!</h1>
+        <form onSubmit={onSubmit}>
+          <img src={logo} alt="Logo Hurry Hand" width={200} style={{ display: "block", margin: "0 auto"}} />
+          <h1 style={styles.title}>¡Bienvenido! Crea tu cuenta aquí</h1>
 
-      {/* Nombre */}
-      <InputField
-        id="name"
-        label="Nombre"
-        value={form.name}
-        onChange={onChange}
-        onBlur={onBlur}
-        onFocus={() => setFocused("name")}
-        placeholder="Tu nombre"
-        error={getFieldError("name")}
-        touched={touched.name || !!serverErrors.name || submitted}
-      />
+          {/* Nombre */}
+          <InputField
+            id="name"
+            label="Nombre"
+            value={form.name}
+            onChange={onChange}
+            onBlur={onBlur}
+            onFocus={() => setFocused("name")}
+            placeholder="Tu nombre"
+            error={getFieldError("name")}
+            touched={touched.name || !!serverErrors.name || submitted}
+          />
 
-      {/* Apellido */}
-      <InputField
-        id="surname" 
-        label="Apellido"
-        name="surname" 
-        value={form.surname} 
-        onChange={onChange} onBlur={onBlur}
-        onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
-        placeholder="Tu apellido"
-        error={getFieldError("surname")}
-        touched={touched.surname || !!serverErrors.surname || submitted}
-      />
+          {/* Apellido */}
+          <InputField
+            id="surname" 
+            label="Apellido"
+            name="surname" 
+            value={form.surname} 
+            onChange={onChange} onBlur={onBlur}
+            onFocus={() => setFocused("surname")} onBlurCapture={() => setFocused(null)}
+            placeholder="Tu apellido"
+            error={getFieldError("surname")}
+            touched={touched.surname || !!serverErrors.surname || submitted}
+          />
 
-      {/* Tipo de documento */}
-      <SelectField
-        id="documentType"
-        label="Tipo de documento"
-        value={form.documentType}
-        onChange={onChange}
-        onFocus={() => setFocused("documentType")}
-        onBlur={() => setFocused(null)}
-        options={[
-          { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
-          { value: "Otro", label: "Otro" }
-        ]}
-        error={getFieldError("documentType")}
-        touched={touched.documentType || !!serverErrors.documentType || submitted}
-      />
+          {/* Tipo de documento */}
+          <SelectField
+            id="documentType"
+            label="Tipo de documento"
+            value={form.documentType}
+            onChange={onChange}
+            onFocus={() => setFocused("documentType")}
+            onBlur={() => setFocused(null)}
+            options={[
+              { value: "Cedula Uruguaya", label: "Cédula Uruguaya" },
+              { value: "Otro", label: "Otro" }
+            ]}
+            error={getFieldError("documentType")}
+            touched={touched.documentType || !!serverErrors.documentType || submitted}
+          />
 
-      {/* Documento */}
-      <InputField
-        id="document" 
-        label="Documento"
-        name="document" 
-        value={form.document}
-        onChange={e => {
-          let value = e.target.value;
-          if (form.documentType === "Cedula Uruguaya") {
-            value = value.replace(/[^0-9]/g, "").slice(0, 8);
-          } else {
-            value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
-          }
-          setForm(f => ({ ...f, document: value }));
-        }}
-        onBlur={onBlur}
-        onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
-        placeholder="Documento"
-        error={getFieldError("document")}
-        touched={touched.document || !!serverErrors.document || submitted}
-      />
+          {/* Documento */}
+          <InputField
+            id="document" 
+            label="Documento"
+            name="document" 
+            value={form.document}
+            onChange={e => {
+              let value = e.target.value;
+              if (form.documentType === "Cedula Uruguaya") {
+                value = value.replace(/[^0-9]/g, "").slice(0, 8);
+              } else {
+                value = value.replace(/[^A-Za-z0-9]/g, "").slice(0, 16); // puedes ajustar el largo máximo
+              }
+              setForm(f => ({ ...f, document: value }));
+            }}
+            onBlur={onBlur}
+            onFocus={() => setFocused("document")} onBlurCapture={() => setFocused(null)}
+            placeholder="Documento"
+            error={getFieldError("document")}
+            touched={touched.document || !!serverErrors.document || submitted}
+          />
 
-      {/* Nacimiento */}
-      <DateField
-        id="birthDate"
-        label="Fecha de nacimiento"
-        value={form.birthDate ? form.birthDate.toISOString().slice(0, 10) : ""}
-        onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
-        onBlur={onBlur}
-        onFocus={() => setFocused("birthDate")}
-        error={getFieldError("birthDate")}
-        touched={touched.birthDate || !!serverErrors.birthDate || submitted}
-      />
+          {/* Nacimiento */}
+          <DateField
+            id="birthDate"
+            label="Fecha de nacimiento"
+            value={form.birthDate ? form.birthDate.toISOString().slice(0, 10) : ""}
+            onChange={e => setForm(f => ({ ...f, birthDate: e.target.value ? new Date(e.target.value) : null }))}
+            onBlur={onBlur}
+            onFocus={() => setFocused("birthDate")}
+            error={getFieldError("birthDate")}
+            touched={touched.birthDate || !!serverErrors.birthDate || submitted}
+          />
 
-      {/* Teléfono */}
-      <InputField
-        id="phoneNumber" 
-        label="Teléfono"
-        name="phoneNumber" 
-        value={form.phoneNumber}
-        onChange={e => {
-          const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 9);
-          setForm(f => ({ ...f, phoneNumber: value }));
-        }}
-        onBlur={onBlur}
-        onFocus={() => setFocused("phoneNumber")} onBlurCapture={() => setFocused(null)}
-        placeholder="Teléfono"
-        error={getFieldError("phoneNumber")}
-        touched={touched.phoneNumber || !!serverErrors.phoneNumber || submitted}
-      />
+          {/* Teléfono */}
+          <InputField
+            id="phoneNumber" 
+            label="Teléfono"
+            name="phoneNumber" 
+            value={form.phoneNumber}
+            onChange={e => {
+              const value = e.target.value
+                .replace(/[^\d+]/g, "")
+                .replace(/(?!^)\+/g, "")
+                .replace(/^(\+?\d{0,11}).*/, "$1")
+                .slice(0, 12); // + y 11 dígitos
+              setForm(f => ({ ...f, phoneNumber: value }));
+            }}
+            onBlur={onBlur}
+            onFocus={() => setFocused("phoneNumber")} onBlurCapture={() => setFocused(null)}
+            placeholder="Teléfono"
+            error={getFieldError("phoneNumber")}
+            touched={touched.phoneNumber || !!serverErrors.phoneNumber || submitted}
+          />
 
-      {/* Email */}
-      <InputField
-        id="email" 
-        label="Email"
-        name="email" 
-        value={form.email} 
-        onChange={onChange} onBlur={onBlur}
-        onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
-        placeholder="tu@email.com"
-        error={getFieldError("email")}
-        touched={touched.email || !!serverErrors.email || submitted}
-      />
+          {/* Email */}
+          <InputField
+            id="email" 
+            label="Email"
+            name="email" 
+            value={form.email} 
+            onChange={onChange} onBlur={onBlur}
+            onFocus={() => setFocused("email")} onBlurCapture={() => setFocused(null)}
+            placeholder="tu@email.com"
+            error={getFieldError("email")}
+            touched={touched.email || !!serverErrors.email || submitted}
+          />
 
-      {/* Password */}
-      <PasswordField
-        id="password"
-        label="Contraseña"
-        value={form.password}
-        onChange={onChange}
-        onBlur={onBlur}
-        onFocus={() => setFocused("password")}
-        placeholder="••••••••"
-        show={showPassword}
-        onToggle={() => setShowPassword(s => !s)}
-        error={getFieldError("password")}
-        touched={touched.password || !!serverErrors.password || submitted}
-      />
-      <div>
-        <div style={styles.meterWrap} aria-hidden>
-          <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
-        </div>
-        <small style={styles.meterText}>{strength.label}</small>
-      </div>
+          {/* Password */}
+          <PasswordField
+            id="password"
+            label="Contraseña"
+            value={form.password}
+            onChange={onChange}
+            onBlur={onBlur}
+            onFocus={() => setFocused("password")}
+            placeholder="••••••••"
+            show={showPassword}
+            onToggle={() => setShowPassword(s => !s)}
+            error={getFieldError("password")}
+            touched={touched.password || !!serverErrors.password || submitted}
+          />
+          <div>
+            <div style={styles.meterWrap} aria-hidden>
+              <div style={{ ...styles.meterBar, width: `${strength.score * 25}%` }} />
+            </div>
+            <small style={styles.meterText}>{strength.label}</small>
+          </div>
 
-      {/* Confirm */}
-      <PasswordField
-        id="confirm" 
-        label="Confirmar contraseña"
-        name="confirm" 
-        value={form.confirm} 
-        onChange={onChange} 
-        onBlur={onBlur}
-        onFocus={() => setFocused("confirm")} 
-        placeholder="Repite la contraseña"
-        show={showConfirm}
-        onToggle={() => setShowConfirm(s => !s)}
-        error={getFieldError("confirm")}
-        touched={touched.confirm || !!serverErrors.confirm || submitted}
-      />
+          {/* Confirm */}
+          <PasswordField
+            id="confirm" 
+            label="Confirmar contraseña"
+            name="confirm" 
+            value={form.confirm} 
+            onChange={onChange} 
+            onBlur={onBlur}
+            onFocus={() => setFocused("confirm")} 
+            placeholder="Repite la contraseña"
+            show={showConfirm}
+            onToggle={() => setShowConfirm(s => !s)}
+            error={getFieldError("confirm")}
+            touched={touched.confirm || !!serverErrors.confirm || submitted}
+          />
 
-      {/* Términos */}
-      <CheckboxField
-        id="accept"
-        label="Acepto los términos y condiciones"
-        checked={form.accept}
-        onChange={onChange}
-        error={!form.accept ? "Debes aceptar para continuar" : ""}
-      />
+          {/* Términos */}
+          <CheckboxField
+            id="accept"
+            label="Acepto los términos y condiciones"
+            checked={form.accept}
+            onChange={onChange}
+            error={!form.accept ? "Debes aceptar para continuar" : ""}
+          />
 
-      <div style={{ margin: "18px 0 8px 0", textAlign: "center" }}>
-        <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
-        <a
-          href="#"
-          style={{ color: "#30a5e8", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
-          onClick={e => { e.preventDefault(); navigate("/login"); }}
-        >Iniciar sesión</a>
-      </div>
+          <div style={{ margin: "18px 0 8px 0", textAlign: "center" }}>
+            <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
+            <a
+              href="#"
+              style={{ color: "#30a5e8", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
+              onClick={e => { e.preventDefault(); navigate("/login"); }}
+            >Iniciar sesión</a>
+          </div>
 
-      <button
-        type="submit"
-        disabled={!isValid || loading}
-        style={buttonStyle(!isValid || loading)}
-      >
-        {loading ? "Enviando..." : "Crear cuenta"}
-      </button>
-    </form>
-    </Card>
+          <button
+            type="submit"
+            disabled={!isValid || loading}
+            style={buttonStyle(!isValid || loading)}
+          >
+            {loading ? "Enviando..." : "Crear cuenta"}
+          </button>
+        </form>
+      </Card>
     </div>
   );
 }
@@ -361,7 +362,7 @@ function isValidDocument(s, type) {
 }
 
 function isValidPhone(s) {
-  return /^[0-9]{9}$/.test(s);
+  return /^\+?[0-9]{11}$/.test(s);
 }
 
 function passwordStrength(pw) {
@@ -414,7 +415,7 @@ const styles = {
   padding: "40px 60px 40px 0",
   backgroundAttachment: "fixed"
   },
-  title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 28, color: "#ffffffff", textAlign: "center"},
+  title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 26, color: "#ffffffff", textAlign: "center"},
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#42b3fd", borderRadius: 999, transition: "width .25s" },
   meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
