@@ -16,6 +16,7 @@ import SelectField from "../components/SelectField";
 import CheckboxField from "../components/CheckboxField";
 import Card from "../components/Card";
 import DateField from "../components/DateField";
+import PhoneField from "../components/PhoneField";
 
 
 const initial = { name: "", surname: "",documentType:"Cedula Uruguaya", document:"", birthDate: null, email: "", password: "", confirm: "", phoneNumber: "", accept: false };
@@ -28,7 +29,9 @@ export default function Register({ width = 420 }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false); 
-
+  const [countryCode, setCountryCode] = useState("+598");
+  const [phoneValue, setPhoneValue] = useState("");
+  
   const [serverErrors, setServerErrors] = useState({});
   
   const rawErrors = useMemo(() => validate(form), [form]);
@@ -224,25 +227,27 @@ export default function Register({ width = 420 }) {
           />
 
           {/* Teléfono */}
-          <InputField
-            id="phoneNumber" 
-            label="Teléfono"
-            name="phoneNumber" 
-            value={form.phoneNumber}
+        <div style={styles.field}>
+          <label style={styles.label}>Teléfono</label>
+          <PhoneField
+            value={phoneValue}
             onChange={e => {
-              const value = e.target.value
-                .replace(/[^\d+]/g, "")
-                .replace(/(?!^)\+/g, "")
-                .replace(/^(\+?\d{0,11}).*/, "$1")
-                .slice(0, 12); // + y 11 dígitos
-              setForm(f => ({ ...f, phoneNumber: value }));
+              const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 12);
+              setPhoneValue(val);
+              setForm(f => ({ ...f, phoneNumber: countryCode + val }));
             }}
+            countryCode={countryCode}
+            onCountryChange={code => {
+              setCountryCode(code);
+              setForm(f => ({ ...f, phoneNumber: code + phoneValue }));
+            }}
+            name="phoneNumber"
             onBlur={onBlur}
-            onFocus={() => setFocused("phoneNumber")} onBlurCapture={() => setFocused(null)}
-            placeholder="Teléfono"
-            error={getFieldError("phoneNumber")}
-            touched={touched.phoneNumber || !!serverErrors.phoneNumber || submitted}
           />
+          {touched.phoneNumber && getFieldError("phoneNumber") && (
+            <p style={styles.error}>{getFieldError("phoneNumber")}</p>
+          )}
+        </div>
 
           {/* Email */}
           <InputField
