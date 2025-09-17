@@ -9,15 +9,31 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
   const toggleMenu = () => setMenuOpen((prev) => !prev);
 
+  function logOut() {
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("jwt_expires");
+    sessionStorage.removeItem("jwt");
+    window.location.href = "/login";
+  }
+
   return (
     <nav style={styles.navbar}>
-      {/* Botón hamburguesa */}
-      <button onClick={toggleMenu} style={styles.menuButton} aria-label="Abrir menú">
-        {menuOpen ? <FaTimes /> : <FaBars />}
-      </button>
-      <div style={styles.logo}>HurryHand</div>
+      {/* Botón hamburguesa y logOut */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <button onClick={toggleMenu} style={styles.menuButton} aria-label="Abrir menú">
+          {menuOpen ? <FaTimes /> : <FaBars />}
+        </button>
+        <div style={styles.logo}>
+          <img src="/HurryHandHorizontal.png" alt="HurryHand Logo" style={{ height: "40px", verticalAlign: "middle" }} />
+        </div>
+          <Link to="/login" onClick={logOut} style={{ ...styles.link, ...styles.button }}>
+            Cerrar sesión
+          </Link>
+      </div>
 
       <SearchBar onSearch={handleSearch} />
+
+
 
       {/* Overlay (click para cerrar) 
       <div
