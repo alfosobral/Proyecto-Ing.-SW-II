@@ -9,15 +9,10 @@ import CheckboxField from "../components/CheckboxField";
 import back from "../assets/RegisterBackground.png";
 import back2 from "../assets/RegisterBackground2.png";
 import back3 from "../assets/RegisterBackground3.png";
-import back4 from "../assets/RegisterBackground4.png";
-import back5 from "../assets/RegisterBackground5.png";
-import back6 from "../assets/RegisterBackground6.png";
-import back7 from "../assets/RegisterBackground7.png";
-import back8 from "../assets/RegisterBackground8.png";
 
 const initial = { email: "", password: "", remember: false };
 
-const backgrounds = [back, back2, back3, back4, back5, back6, back7, back8];
+const backgrounds = [back, back2, back3];
 
 export default function LogIn() {
   const [form, setForm] = React.useState(initial);
@@ -112,9 +107,16 @@ export default function LogIn() {
       }
 
       const data = await res.json();
-      
-      
-
+      // Guardar el JWT según la casilla 'Recordarme'
+      if (data.token) {
+        if (form.remember) {
+          const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 horas en ms
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("jwt_expires", expiresAt.toString());
+        } else {
+          sessionStorage.setItem("jwt", data.token);
+        }
+      }
       navigate("/home_page");
     } catch (err) {
       console.error("Error al registrar:", err);

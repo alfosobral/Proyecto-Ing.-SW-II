@@ -1,12 +1,24 @@
 import Register from "./pages/Register";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LogIn from "./pages/LogIn";
 import HomePage from "./pages/HomePage"
 import ServicePost from "./pages/ServicePost";
+import { useEffect } from "react";
 
 
 
 function App() {
+  // Verificación global de expiración de token
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    const expiresAt = localStorage.getItem("jwt_expires");
+    if (token && expiresAt && Date.now() > Number(expiresAt)) {
+      localStorage.removeItem("jwt");
+      localStorage.removeItem("jwt_expires");
+      alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+      window.location.href = "/login";
+    }
+  }, []);
   return (
     <BrowserRouter>
       <Routes>
