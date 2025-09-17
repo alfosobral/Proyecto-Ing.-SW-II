@@ -1,14 +1,16 @@
-# Etapa 1: build (Vite -> dist)
-FROM node:20 AS build
+# --- build ---
+FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --silent || npm install --silent
+RUN npm ci
 COPY . .
-RUN npm run build  # Vite genera /app/dist
+RUN npm run build
 
-# Etapa 2: servir estáticos con Nginx
-FROM nginx:alpine
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/dist ./
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# --- runtime ---
+FROM nginx:1.27-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+# Si usas rutas del lado del cliente (SPA), habilita fallback:
+# RUN rm /etc/nginx/conf.d/default.conf
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
+CMD ["nginx","-g","daemon off;"]
