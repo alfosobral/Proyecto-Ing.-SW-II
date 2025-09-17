@@ -98,7 +98,7 @@ export default function Register({ width = 420 }) {
         } else if (data?.message) {
           if (/mail|correo/i.test(data.message) && /existe|registrad/i.test(data.message)) {
             mapped.email = data.message;
-          } else if ((/teléfono/i.test(data.message) && /existe/i.test(data.message))) {
+          } else if (/tel[eé]fono/i.test(data.message) && /existe/i.test(data.message)) {
             mapped.phoneNumber = data.message;
           } else {
             mapped._general = data.message; 
@@ -246,6 +246,8 @@ export default function Register({ width = 420 }) {
               setForm(f => ({ ...f, phoneNumber: code + phoneValue }));
             }}
             onBlur={onBlur}
+            error={getFieldError("phoneNumber")}
+            touched={touched.phoneNumber || !!serverErrors.phoneNumber || submitted}
           />
 
           {/* Email */}
