@@ -6,6 +6,9 @@ import back from "../assets/RegisterBackground.png";
 import back2 from "../assets/RegisterBackground2.png";
 import back3 from "../assets/RegisterBackground3.png";
 import back4 from "../assets/RegisterBackground4.png";
+import back5 from "../assets/RegisterBackground5.png";
+import back6 from "../assets/RegisterBackground6.png";
+
 import InputField from "../components/InputField";
 import PasswordField from "../components/PasswordField";
 import SelectField from "../components/SelectField";
@@ -35,7 +38,7 @@ export default function Register({ width = 420 }) {
 
   const strength = passwordStrength(form.password);
 
-  const backgrounds = [back, back2, back3, back4];
+  const backgrounds = [back, back2, back3, back4, back5, back6];
   const [idx, setIdx] = useState(0);
 
   const getFieldError = (name) => {
@@ -309,7 +312,7 @@ export default function Register({ width = 420 }) {
             <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
             <a
               href="#"
-              style={{ color: "#30a5e8", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
+              style={{ color: "#34aadcff", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
               onClick={e => { e.preventDefault(); navigate("/login"); }}
             >Iniciar sesión</a>
           </div>

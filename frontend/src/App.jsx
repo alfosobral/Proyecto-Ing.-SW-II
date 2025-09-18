@@ -27,6 +27,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/home_page" element={<HomePage />} />
         <Route path="/service_post" element={<ServicePost />} />
+        <Route path="/profile" element={<ServicePost />} />
       </Routes>
     </BrowserRouter>
   );

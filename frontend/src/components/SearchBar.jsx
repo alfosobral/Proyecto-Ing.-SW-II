@@ -44,7 +44,7 @@ const styles = {
   form: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#1a1b25",
+    backgroundColor: "#2d2e3bff",
     borderRadius: 8,
     overflow: "hidden",
   },
@@ -54,7 +54,7 @@ const styles = {
     outline: "none",
     padding: "8px 12px",
     fontSize: 14,
-    background: "#111827",
+    background: "#2d3341ff",
     color: "#fff",
   },
   button: {
@@ -62,7 +62,7 @@ const styles = {
     outline: "none",
     padding: "8px 12px",
     cursor: "pointer",
-    background: "#111827",
+    background: "#2d3341ff",
     color: "#fff",
     display: "flex",
     alignItems: "center",

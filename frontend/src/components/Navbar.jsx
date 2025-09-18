@@ -19,16 +19,13 @@ export default function Navbar() {
   return (
     <nav style={styles.navbar}>
       {/* Botón hamburguesa y logOut */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%" }}>
         <button onClick={toggleMenu} style={styles.menuButton} aria-label="Abrir menú">
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
-        <div style={styles.logo}>
-          <img src="/HurryHandHorizontal.png" alt="HurryHand Logo" style={{ height: "40px", verticalAlign: "middle" }} />
+        <div style={{ ...styles.logo, display: "flex", alignItems: "center", height: "100%" }}>
+          <img src="/HurryHandHorizontal.png" alt="HurryHand Logo" style={{ height: "40px", verticalAlign: "middle", display: "block", margin: "0 auto" }} />
         </div>
-          <Link to="/login" onClick={logOut} style={{ ...styles.link, ...styles.button }}>
-            Cerrar sesión
-          </Link>
       </div>
 
       <SearchBar onSearch={handleSearch} />
@@ -59,7 +56,48 @@ export default function Navbar() {
       </aside>
 
       <div style={styles.actions}>
-        <Link to="/login" style={{ ...styles.link, ...styles.button }}>Ingresar</Link>
+        {(() => {
+          const hasToken = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
+          const [dropdownOpen, setDropdownOpen] = useState(false);
+          if (hasToken) {
+            return (
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={() => setDropdownOpen((open) => !open)}
+                  style={{ ...styles.link, ...styles.button, padding: 0, background: "none", border: "none" }}
+                >
+                  <img src="/src/assets/profile.png" alt="Perfil" style={{ height: "32px", width: "32px", borderRadius: "50%", verticalAlign: "middle" }} />
+                </button>
+                {dropdownOpen && (
+                  <div style={styles.dropdownMenu}>
+                    <button
+                      onClick={() => { window.location.href = '/perfil'; setDropdownOpen(false); }}
+                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
+                    >
+                      Ir al perfil
+                    </button>
+                    <button
+                      onClick={() => { window.location.href = '/credential'; setDropdownOpen(false); }}
+                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
+                    >
+                      Mis credenciales
+                    </button>
+                    <button
+                      onClick={logOut}
+                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          } else {
+            return (
+              <Link to="/login" style={{ ...styles.link, ...styles.button }}>Ingresar</Link>
+            );
+          }
+        })()}
       </div>
     </nav>
   );
@@ -70,10 +108,24 @@ function handleSearch(query) {
 }
 
 const styles = {
+  dropdownMenu: {
+    position: "absolute",
+    top: "110%",
+    right: 0,
+    width: 200,
+    height: "auto",
+    minWidth: 140,
+    zIndex: 1002,
+    boxShadow: "0 2px 8px rgba(6, 6, 39, 0.12)",
+    background: "#34aadc76",
+    borderRadius: 4,
+    willChange: "transform",
+    transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
+  },
   navbar: {
     width: "100%",
     height: "12vh",
-    background: "rgba(15, 16, 26, 0.35)",
+    background: "rgba(13, 14, 17, 0.35)",
     display: "flex",
     flexdirection: "row",
     alignItems: "center",
@@ -100,7 +152,7 @@ const styles = {
   },
   button: {
     padding: "6px 14px",
-    backgroundColor: "#42b3fd",
+    backgroundColor: "#34aadcff",
     borderRadius: "6px",
   },
   menuButton: {

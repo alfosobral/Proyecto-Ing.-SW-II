@@ -107,7 +107,9 @@ export default function LogIn() {
       }
 
       const data = await res.json();
-      // Guardar el JWT según la casilla 'Recordarme'
+      console.log("JSON completo del backend:", data); // <-- Esto lo imprime en la consola
+
+      // Guardar el JWT según la casilla 'Recordarme'      
       if (data.token) {
         if (form.remember) {
           const expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 horas en ms
