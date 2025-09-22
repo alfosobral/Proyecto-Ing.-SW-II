@@ -1,49 +1,54 @@
 import React from "react";
 
-export default function SelectField({
-  id,
-  label,
-  value,
-  onChange,
-  onFocus,
-  onBlur,
-  options,
-  error,
-  touched,
-  style,
-  ...props
+export default function TextAreaField({ 
+    id, 
+    label, 
+    value, 
+    onChange, 
+    onBlur, 
+    onFocus, 
+    placeholder, 
+    error, 
+    touched,
+    type = "text",
+    rows = 6,
+    ...props
 }) {
-  const [focused, setFocused] = React.useState(false);
-
-  const handleFocus = e => {
+    const [focused, setFocused] = React.useState(false);
+    
+    // Handlers seguros
+    const handleFocus = e => {
     setFocused(true);
     if (onFocus) onFocus(e);
-  };
-  const handleBlur = e => {
+    };
+    const handleBlur = e => {
     setFocused(false);
     if (onBlur) onBlur(e);
-  };
+    }
 
   return (
     <div style={{ marginBottom: 14, width: "100%" }}>
-      <label
+        <label
         htmlFor={id}
         style={{
-          fontSize: 14,
-          color: "#bababaff",
-          marginBottom: 6,
-          display: "block",
+            fontSize: 14,
+            color: "#bababaff",
+            marginBottom: 6,
+            display: "block",
         }}
       >
         {label}
       </label>
-      <select
+      <textarea
         id={id}
         name={id}
+        type={type}
         value={value}
         onChange={onChange}
-        onFocus={handleFocus}
         onBlur={handleBlur}
+        onFocus={handleFocus}
+        placeholder={placeholder}
+        rows={rows}
         style={{
           width: "100%",
           padding: "10px 12px",
@@ -56,15 +61,10 @@ export default function SelectField({
           boxShadow: focused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
           background: "#ffffff",
           boxSizing: "border-box",
+          fontFamily: "inherit",
         }}
-        {...props}
-      >
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      {...props}
+      />
       {touched && error && (
         <p style={{ color: "#dc2626", fontSize: 13, marginTop: 6 }}>{error}</p>
       )}

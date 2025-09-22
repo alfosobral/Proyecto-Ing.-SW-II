@@ -4,6 +4,7 @@ import LogIn from "./pages/LogIn";
 import HomePage from "./pages/HomePage"
 import ServicePost from "./pages/ServicePost";
 import { useEffect } from "react";
+import ServicePost2 from "./pages/ServicePost2";
 
 
 
@@ -26,7 +27,7 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home_page" element={<HomePage />} />
-        <Route path="/service_post" element={<ServicePost />} />
+        <Route path="/service_post" element={<ServicePost2 />} />
         <Route path="/profile" element={<ServicePost />} />
       </Routes>
     </BrowserRouter>
