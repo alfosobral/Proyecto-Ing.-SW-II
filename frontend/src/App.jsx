@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import LogIn from "./pages/LogIn";
 import HomePage from "./pages/HomePage"
 import ServicePost from "./pages/ServicePost";
+import Profile from "./pages/Profile";
 import { useEffect } from "react";
 
 
@@ -27,7 +28,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/home_page" element={<HomePage />} />
         <Route path="/service_post" element={<ServicePost />} />
-        <Route path="/profile" element={<ServicePost />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

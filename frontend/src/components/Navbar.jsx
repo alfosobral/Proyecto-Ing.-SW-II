@@ -71,7 +71,7 @@ export default function Navbar() {
                 {dropdownOpen && (
                   <div style={styles.dropdownMenu}>
                     <button
-                      onClick={() => { window.location.href = '/perfil'; setDropdownOpen(false); }}
+                      onClick={() => { window.location.href = '/profile'; setDropdownOpen(false); }}
                       style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
                     >
                       Ir al perfil
