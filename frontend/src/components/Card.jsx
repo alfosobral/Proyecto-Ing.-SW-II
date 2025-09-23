@@ -4,8 +4,8 @@ export default function Card({ children, style }) {
   return (
     <div
       style={{
-        width: "100%",
-        maxWidth: 550,
+        width: "45vw",
+        //maxWidth: 550,
         minHeight: "100vh",
         background: "rgba(15, 16, 26, 0.35)",
         padding: "35px 35px 35px 35px",
