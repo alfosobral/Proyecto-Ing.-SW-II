@@ -27,7 +27,7 @@ export default function SubmitButton({
   // Paleta simple por si luego querés otras variantes
   const palette = {
     primary: {
-      bg: "#2563eb",
+      bg: "#34aadcff",
       bgDisabled: "#cbd5e1",
       fg: "#fff",
       fgDisabled: "#64748b",

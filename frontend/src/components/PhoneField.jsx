@@ -40,7 +40,7 @@ export default function PhoneField({
           htmlFor={id}
           style={{
             fontSize: 14,
-            color: "#bababaff",
+            color: "#ffffffff",
             marginBottom: 6,
             display: "block",
           }}
@@ -103,7 +103,7 @@ export default function PhoneField({
             outline: "none",
             padding: "10px 12px",
             fontSize: 14,
-            background: "white",
+            background: "ffffff77",
             boxSizing: "border-box",
           }}
           {...props}

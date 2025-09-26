@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import background from "../assets/Background.png";
+import Card from "../components/Card";
+import InputField from "../components/InputField";
+import SubmitButton from "../components/SummbitButton";
+import DateField from "../components/DateField";
+import SelectField from "../components/SelectField";
+import PhoneField from "../components/PhoneField";
+import TextAreaField from "../components/TextAreaField";
 
 /** ======= THEME ======= */
 const theme = {
@@ -15,30 +23,79 @@ const theme = {
 };
 
 const styles = {
-  page: { minHeight: "100vh", background: theme.bg, fontFamily: theme.font },
-  navbar: {
-    width: "100%", background: "rgba(13,14,17,0.40)",
-    boxShadow: "0 2px 8px #0005", padding: "10px 0",
-    display: "flex", alignItems: "center", justifyContent: "space-between",
-    position: "sticky", top: 0, zIndex: 10
+  page: {
+    minHeight: "85vh",
+    width: "100vw",
+    backgroundImage: `url(${background})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "40px 60px 40px 0",
+    backgroundAttachment: "fixed",
+    fontFamily: theme.font
   },
-  navTitle: { flex: 2, textAlign: "center", fontWeight: 700, fontSize: 20, color: theme.text },
-  container: { maxWidth: 900, margin: "36px auto", padding: "0 16px" },
+  container: { 
+    maxWidth: 900, 
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 24,
+    alignItems: "center"
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 700,
+    color: theme.text,
+    marginBottom: 16,
+    borderBottom: `1px solid ${theme.accent}`,
+    paddingBottom: 8,
+    textAlign: "center"
+  },
+  gridRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: 16,
+    marginBottom: 16
+  },
+  fullWidth: {
+    gridColumn: "1 / -1"
+  },
   card: {
     background: theme.card, borderRadius: theme.radius, boxShadow: "0 2px 12px #0006",
     padding: 24, color: theme.text
   },
   cardTitle: { fontSize: 20, fontWeight: 700, marginBottom: 16 },
   grid: { display: "grid", gridTemplateColumns: "300px 1fr", gap: 24 },
-  avatarBox: { width: "100%", display: "flex", flexDirection: "column", alignItems: "center" },
+  avatarBox: { 
+    width: "100%", 
+    display: "flex", 
+    flexDirection: "column", 
+    alignItems: "center",
+    marginBottom: 20
+  },
   avatarImg: {
-    width: "100%", maxWidth: 260, height: 320, objectFit: "cover",
-    borderRadius: 16, border: theme.border, boxShadow: "0 3px 12px #0007", background: "#0b1533"
+    width: 200,
+    height: 250,
+    objectFit: "cover",
+    borderRadius: 16,
+    border: theme.border,
+    boxShadow: "0 3px 12px #0007",
+    background: "#0b1533"
   },
   uploadDrop: {
-    width: "100%", maxWidth: 260, height: 320, borderRadius: 16,
-    background: "#0b1533", display: "flex", alignItems: "center", justifyContent: "center",
-    border: theme.border, color: theme.accent, cursor: "pointer"
+    width: 200,
+    height: 250,
+    borderRadius: 16,
+    background: "#ffffff77",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    border: theme.border,
+    color: theme.accent,
+    cursor: "pointer"
   },
   fieldsBox: { display: "grid", gridTemplateColumns: "1fr", gap: 12 },
   label: { fontSize: 12, color: theme.textSoft, fontWeight: 600, marginBottom: 6 },
@@ -97,44 +154,27 @@ const styles = {
   },
 };
 
-function FieldRow({ label, value, onEdit }) {
-  return (
-    <div>
-      <div style={styles.label}>{label}</div>
-
-      {/* fila a lo ancho */}
-      <div style={styles.fieldRow}>
-        {/* celda que ocupa todo el ancho */}
-        <div style={styles.valueRow}>
-          {value ?? "-"}
-        </div>
-
-        {/* botón pegado a la derecha */}
-        {onEdit && (
-          <button style={styles.editBtn} onClick={onEdit}>
-            Editar
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function Section({ title, children }) {
-  return (
-    <div>
-      <div style={styles.cardTitle}>{title}</div>
-      {children}
-    </div>
-  );
-}
-
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    birthdate: '',
+    personalIdType: '',
+    personalId: '',
+    phoneNumber: '',
+    provider: false,
+    credentialTitle: '',
+    credentialImageUrl: '',
+    credentialDescription: '',
+    credentialIssuer: '',
+    credentialDate: ''
+  });
   const API = import.meta.env.VITE_API_URL;
 
   // cleanup de la preview
@@ -168,7 +208,7 @@ export default function Profile() {
     }
   };
 
-  // Cargar usuario
+  // Cargar usuario y llenar formData
   useEffect(() => {
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
     let email = "";
@@ -177,9 +217,40 @@ export default function Profile() {
 
     fetch(`${API}/api/user/email/${email}`, { headers: { Authorization: `Bearer ${token}` }})
       .then(r => { if (!r.ok) throw new Error("No se pudo obtener el usuario"); return r.json(); })
-      .then(d => { setUser(d); setLoading(false); })
+      .then(d => { 
+        setUser(d); 
+        setFormData({
+          name: d.name || '',
+          surname: d.surname || '',
+          email: d.email || '',
+          birthdate: d.birthdate || '',
+          personalIdType: d.personalIdType || '',
+          personalId: d.personalId || '',
+          phoneNumber: d.phoneNumber || '',
+          provider: d.provider || false,
+          credentialTitle: '',
+          credentialImageUrl: '',
+          credentialDescription: '',
+          credentialIssuer: '',
+          credentialDate: ''
+        });
+        setLoading(false); 
+      })
       .catch(e => { setError(e.message); setLoading(false); });
   }, []);
+
+  const handleInputChange = (id, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert("Guardando cambios...");
+    // Aquí iría la lógica para enviar al backend
+  };
 
   if (loading) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Cargando…</div>;
   if (error) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Error: {error}</div>;
@@ -187,111 +258,174 @@ export default function Profile() {
 
   return (
     <div style={styles.page}>
-      {/* NAVBAR */}
-      <div style={styles.navbar}>
-        <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-          <button onClick={() => navigate(-1)} style={{ background: "none", border: "none", cursor: "pointer", marginLeft: 16, marginRight: 16 }}>
-            <span style={{ fontSize: 28, color: theme.text }}>&larr;</span>
-          </button>
-          <img src="/HurryHandHorizontal.png" alt="HurryHand" style={{ height: 40, marginRight: 16 }} />
-        </div>
-        <div style={styles.navTitle}>Perfil del usuario</div>
-        <div style={{ flex: 1 }} />
-      </div>
-
+      
+      
       <div style={styles.container}>
-        {/* ===== Card de PERFIL (todo junto) ===== */}
-        <div style={styles.card}>
-          <Section title="Información personal">
-            <div style={styles.grid}>
-              {/* Avatar */}
-              <div style={styles.avatarBox}>
-                {preview || user.profilePhoto ? (
-                  <img
-                    src={preview || user.profilePhoto}
-                    alt="Foto de perfil"
-                    onError={(e) => (e.currentTarget.src = "/default-credential.png")}
-                    style={styles.avatarImg}
-                  />
-                ) : (
-                  <label htmlFor="profile-upload" style={styles.uploadDrop} title="Subir foto">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 16V8m0 0-4 4m4-4 4 4" />
-                      <rect x="3" y="3" width="18" height="18" rx="4" />
-                    </svg>
-                  </label>
-                )}
-                <input id="profile-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
-                <div style={{ marginTop: 10 }}>
-                  <label htmlFor="profile-upload" style={{ ...styles.editBtn, padding: "8px 12px", display: "inline-block" }}>
-                    {preview || user.profilePhoto ? "Cambiar foto" : "Subir foto"}
-                  </label>
-                </div>
-              </div>
+        {/* Card principal con información personal */}
+        <Card>
+          <div style={styles.sectionTitle}>Información Personal</div>
+          
+          {/* Avatar */}
+          <div style={styles.avatarBox}>
+            {preview || user?.profilePhoto ? (
+              <img
+                src={preview || user.profilePhoto}
+                alt="Foto de perfil"
+                onError={(e) => (e.currentTarget.src = "/default-credential.png")}
+                style={styles.avatarImg}
+              />
+            ) : (
+              <label htmlFor="profile-upload" style={styles.uploadDrop} title="Subir foto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke={theme.accent} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 16V8m0 0-4 4m4-4 4 4" />
+                  <rect x="3" y="3" width="18" height="18" rx="4" />
+                </svg>
+              </label>
+            )}
+            <input id="profile-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
+            <SubmitButton
+              onClick={() => document.getElementById('profile-upload').click()}
+              style={{ marginTop: 10, width: 'auto' }}
+            >
+              {preview || user?.profilePhoto ? "Cambiar foto" : "Subir foto"}
+            </SubmitButton>
+          </div>
 
-              {/* Campos */}
-              <div style={styles.fieldsBox}>
-                <FieldRow label="Nombre" value={user.name} onEdit={() => alert("Editar Nombre")} />
-                <FieldRow label="Apellido" value={user.surname} onEdit={() => alert("Editar Apellido")} />
-                <FieldRow label="Email" value={user.email} onEdit={() => alert("Editar Email")} />
-                <FieldRow label="Fecha de cumpleaños" value={user.birthdate} />
-                <FieldRow label="Tipo de ID" value={user.personalIdType} />
-                <FieldRow label="Personal ID" value={user.personalId} />
-                <FieldRow label="Teléfono" value={user.phoneNumber} onEdit={() => alert("Editar Teléfono")} />
-                <div style={styles.sectionDivider} />
-                <FieldRow
-                  label="Proveedor"
-                  value={user.provider ? "Sí" : "No"}
-                  onEdit={() => alert("Cambiar Proveedor")}
-                />
-                {user.location && (
-                  <>
-                    <div style={styles.sectionDivider} />
-                    <FieldRow label="Departamento" value={user.location.departamento} onEdit={() => alert("Editar Departamento")} />
-                    <FieldRow label="Barrio" value={user.location.neighbourhood} onEdit={() => alert("Editar Barrio")} />
-                    <FieldRow label="Calle y número" value={`${user.location.street} ${user.location.streetNumber}`} onEdit={() => alert("Editar Dirección")} />
-                    <FieldRow label="Apto" value={user.location.aptoNumber} onEdit={() => alert("Editar Apto")} />
-                    <FieldRow label="Código Postal" value={user.location.postalCode} onEdit={() => alert("Editar CP")} />
-                  </>
-                )}
-              </div>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.gridRow}>
+              <InputField
+                id="name"
+                label="Nombre"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Ingrese su nombre"
+              />
+              <InputField
+                id="surname"
+                label="Apellido"
+                value={formData.surname}
+                onChange={(e) => handleInputChange('surname', e.target.value)}
+                placeholder="Ingrese su apellido"
+              />
             </div>
-          </Section>
-        </div>
 
-        {/* ===== Card de CREDENCIALES (abajo) ===== */}
-        <div style={styles.credCard}>
-          <div style={styles.cardTitle}>Credenciales</div>
-          <form onSubmit={(e) => { e.preventDefault(); alert("Guardar credencial"); }}>
-            <div style={styles.row}>
-              <div>
-                <div style={styles.label}>Título de credencial</div>
-                <input style={styles.input} type="text" placeholder="Ej: Electricista profesional" />
-              </div>
-              <div>
-                <div style={styles.label}>URL de imagen (logo)</div>
-                <input style={styles.input} type="url" placeholder="https://..." />
-              </div>
+            <div style={styles.gridRow}>
+              <InputField
+                id="email"
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="Ingrese su email"
+              />
+              <DateField
+                id="birthdate"
+                label="Fecha de nacimiento"
+                value={formData.birthdate}
+                onChange={(e) => handleInputChange('birthdate', e.target.value)}
+              />
             </div>
-            <div style={{ marginTop: 16 }}>
-              <div style={styles.label}>Descripción</div>
-              <input style={styles.input} type="text" placeholder="Breve descripción" />
+
+            <div style={styles.gridRow}>
+              <SelectField
+                id="personalIdType"
+                label="Tipo de ID"
+                value={formData.personalIdType}
+                onChange={(e) => handleInputChange('personalIdType', e.target.value)}
+                options={[
+                  { value: '', label: 'Seleccione tipo de ID' },
+                  { value: 'cedula', label: 'Cédula' },
+                  { value: 'pasaporte', label: 'Pasaporte' },
+                  { value: 'dni', label: 'DNI' }
+                ]}
+              />
+              <InputField
+                id="personalId"
+                label="Número de ID"
+                value={formData.personalId}
+                onChange={(e) => handleInputChange('personalId', e.target.value)}
+                placeholder="Ingrese su número de ID"
+              />
             </div>
-            <div style={{ ...styles.row, marginTop: 16 }}>
-              <div>
-                <div style={styles.label}>Emisor</div>
-                <input style={styles.input} type="text" placeholder="Institución" />
-              </div>
-              <div>
-                <div style={styles.label}>Fecha de emisión</div>
-                <input style={styles.input} type="date" />
-              </div>
+
+            <div style={styles.gridRow}>
+              <PhoneField
+                id="phoneNumber"
+                label="Teléfono"
+                value={formData.phoneNumber}
+                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                placeholder="Ingrese su teléfono"
+              />
+              <SelectField
+                id="provider"
+                label="¿Es proveedor de servicios?"
+                value={formData.provider}
+                onChange={(e) => handleInputChange('provider', e.target.value === 'true')}
+                options={[
+                  { value: false, label: 'No' },
+                  { value: true, label: 'Sí' }
+                ]}
+              />
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
-              <button type="submit" style={styles.editBtn}>Agregar</button>
-            </div>
+
+            <SubmitButton type="submit" style={{ marginTop: 20 }}>
+              Guardar Cambios
+            </SubmitButton>
           </form>
-        </div>
+        </Card>
+
+        {/* Card de credenciales */}
+        <Card>
+          <div style={styles.sectionTitle}>Agregar Credencial</div>
+          <form onSubmit={(e) => { e.preventDefault(); alert("Guardar credencial"); }}>
+            <div style={styles.gridRow}>
+              <InputField
+                id="credentialTitle"
+                label="Título de credencial"
+                value={formData.credentialTitle}
+                onChange={(e) => handleInputChange('credentialTitle', e.target.value)}
+                placeholder="Ej: Electricista profesional"
+              />
+              <InputField
+                id="credentialImageUrl"
+                label="URL de imagen (logo)"
+                type="url"
+                value={formData.credentialImageUrl}
+                onChange={(e) => handleInputChange('credentialImageUrl', e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+
+            <TextAreaField
+              id="credentialDescription"
+              label="Descripción"
+              value={formData.credentialDescription}
+              onChange={(e) => handleInputChange('credentialDescription', e.target.value)}
+              placeholder="Breve descripción de la credencial"
+              
+            />
+
+            <div style={styles.gridRow}>
+              <InputField
+                id="credentialIssuer"
+                label="Emisor"
+                value={formData.credentialIssuer}
+                onChange={(e) => handleInputChange('credentialIssuer', e.target.value)}
+                placeholder="Institución emisora"
+              />
+              <DateField
+                id="credentialDate"
+                label="Fecha de emisión"
+                value={formData.credentialDate}
+                onChange={(e) => handleInputChange('credentialDate', e.target.value)}
+              />
+            </div>
+
+            <SubmitButton type="submit" style={{ marginTop: 20 }}>
+              Agregar Credencial
+            </SubmitButton>
+          </form>
+        </Card>
       </div>
     </div>
   );

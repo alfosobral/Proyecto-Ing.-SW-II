@@ -28,6 +28,7 @@ function App() {
         <Route path="/home_page" element={<HomePage />} />
         <Route path="/service_post" element={<ServicePost />} />
         <Route path="/profile" element={<Profile />} />
+  
       </Routes>
     </BrowserRouter>
   );

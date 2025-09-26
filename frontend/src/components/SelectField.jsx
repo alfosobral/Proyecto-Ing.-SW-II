@@ -30,7 +30,7 @@ export default function SelectField({
         htmlFor={id}
         style={{
           fontSize: 14,
-          color: "#bababaff",
+          color: "#ffffffff",
           marginBottom: 6,
           display: "block",
         }}
@@ -54,7 +54,7 @@ export default function SelectField({
           transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
           transform: focused ? "scale(1.02)" : "scale(1)",
           boxShadow: focused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
-          background: "#ffffff",
+          background: "#ffffff77",
           boxSizing: "border-box",
         }}
         {...props}
