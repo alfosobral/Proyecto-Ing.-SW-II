@@ -32,7 +32,7 @@ export default function PasswordField({
         htmlFor={id}
         style={{
           fontSize: 14,
-          color: "#bababaff",
+          color: "#ffffffff",
           marginBottom: 6,
           display: "block",
         }}
@@ -59,7 +59,7 @@ export default function PasswordField({
             transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
             transform: focused ? "scale(1.02)" : "scale(1)",
             boxShadow: focused ? "0 0 0 5px rgba(37,99,235,.15)" : "none",
-            background: "ffffff77",
+            background: "#ffffff77",
             boxSizing: "border-box",
           }}
           {...props}
@@ -75,7 +75,7 @@ export default function PasswordField({
             transform: "translateY(-50%)",
             background: "none",
             border: "none",
-            color: "#b6b6b6ff",
+            color: "#ffffffff",
             cursor: "pointer",
             fontSize: 20,
             padding: 0,

@@ -187,8 +187,8 @@ export default function LogIn() {
             onChange={onChange}
           />
 
-		  <div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#bababaff" }}>
-				¿Aún no tienes una cuenta?{' '}
+		  <div style={{ width: "100%", textAlign: "center", margin: "20px 0 0 0", fontSize: 14, color: "#ffffffff" }}>
+				¿Aún no tienes una cuenta?{'  '}
 				<a href="/register" style={{ color: "#42b3fd", textDecoration: "underline", fontWeight: 600 }}>Regístrate aquí</a>
 			</div>
 
