@@ -7,7 +7,7 @@ export default function Card({ children, style }) {
         width: "45vw",
         //maxWidth: 550,
         minHeight: "100vh",
-        background: "rgba(225, 220, 220, 0.4)",
+        background: "hsla(0, 8%, 87%, 0.40)",
         padding: "35px 35px 35px 35px",
         borderRadius: 12,
         boxShadow: "0 10px 30px rgba(0,0,0,.2)",

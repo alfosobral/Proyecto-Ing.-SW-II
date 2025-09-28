@@ -58,7 +58,7 @@ export default function PhoneField({
           borderRadius: 12,
           border: `4px solid ${error ? "#ef4444" : focused ? "#42b3fd" : "#cbd5e1"}`,
           outline: "none",
-          background: "white",
+          background: "#ffffff77",
           boxSizing: "border-box",
           transition: "transform .15s ease, box-shadow .15s ease, border-color .15s ease",
           transform: focused ? "scale(1.02)" : "scale(1)",
@@ -74,7 +74,7 @@ export default function PhoneField({
           style={{
             border: "none",
             outline: "none",
-            background: "white",
+            background: "#ffffff30",
             padding: "10px 8px",
             fontSize: 14,
             cursor: "pointer",
@@ -103,7 +103,7 @@ export default function PhoneField({
             outline: "none",
             padding: "10px 12px",
             fontSize: 14,
-            background: "ffffff77",
+            background: "#ffffff30",
             boxSizing: "border-box",
           }}
           {...props}

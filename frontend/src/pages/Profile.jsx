@@ -8,15 +8,15 @@ import DateField from "../components/DateField";
 import SelectField from "../components/SelectField";
 import PhoneField from "../components/PhoneField";
 import TextAreaField from "../components/TextAreaField";
+import ProfileNavbar from "../components/ProfileNavbar";
 
-/** ======= THEME ======= */
 const theme = {
-  bg: "#06112e",            // fondo app
-  card: "#0c1735",          // fondo card
-  cardAlt: "#0e1b42",       // fondo card secundaria
-  accent: "#34aadc",        // celeste HurryHand
-  text: "#eaf2ff",          // texto base
-  textSoft: "#a9bddc",      // texto suave
+  bg: "#06112e",
+  card: "#0c1735",
+  cardAlt: "#0e1b42",
+  accent: "#34aadc",
+  text: "#eaf2ff",
+  textSoft: "#a9bddc",
   border: "2px solid #34aadc",
   radius: 12,
   font: "Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial",
@@ -32,49 +32,50 @@ const styles = {
     backgroundRepeat: "no-repeat",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    padding: "40px 60px 40px 0",
+    alignItems: "flex-start",
+    padding: "120px 60px 40px 0",
     backgroundAttachment: "fixed",
-    fontFamily: theme.font
+    fontFamily: theme.font,
   },
-  container: { 
-    maxWidth: 900, 
+  container: {
+    maxWidth: 900,
     width: "100%",
     display: "flex",
     flexDirection: "column",
     gap: 24,
-    alignItems: "center"
+    alignItems: "center",
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 700,
     color: theme.text,
     marginBottom: 16,
     borderBottom: `1px solid ${theme.accent}`,
     paddingBottom: 8,
-    textAlign: "center"
+    textAlign: "center",
   },
   gridRow: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: 16,
-    marginBottom: 16
+    marginBottom: 16,
   },
-  fullWidth: {
-    gridColumn: "1 / -1"
-  },
+  fullWidth: { gridColumn: "1 / -1" },
   card: {
-    background: theme.card, borderRadius: theme.radius, boxShadow: "0 2px 12px #0006",
-    padding: 24, color: theme.text
+    background: theme.card,
+    borderRadius: theme.radius,
+    boxShadow: "0 2px 12px #0006",
+    padding: 24,
+    color: theme.text,
   },
   cardTitle: { fontSize: 20, fontWeight: 700, marginBottom: 16 },
   grid: { display: "grid", gridTemplateColumns: "300px 1fr", gap: 24 },
-  avatarBox: { 
-    width: "100%", 
-    display: "flex", 
-    flexDirection: "column", 
+  avatarBox: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
     alignItems: "center",
-    marginBottom: 20
+    marginBottom: 20,
   },
   avatarImg: {
     width: 200,
@@ -83,7 +84,7 @@ const styles = {
     borderRadius: 16,
     border: theme.border,
     boxShadow: "0 3px 12px #0007",
-    background: "#0b1533"
+    background: "#0b1533",
   },
   uploadDrop: {
     width: 200,
@@ -95,39 +96,53 @@ const styles = {
     justifyContent: "center",
     border: theme.border,
     color: theme.accent,
-    cursor: "pointer"
+    cursor: "pointer",
   },
   fieldsBox: { display: "grid", gridTemplateColumns: "1fr", gap: 12 },
   label: { fontSize: 12, color: theme.textSoft, fontWeight: 600, marginBottom: 6 },
   valueRow: {
-    background: theme.cardAlt, borderRadius: 12, padding: "12px 14px",
-    border: theme.border, color: theme.text, display: "flex", alignItems: "center", minHeight: 44
+    background: theme.cardAlt,
+    borderRadius: 12,
+    padding: "12px 14px",
+    border: theme.border,
+    color: theme.text,
+    display: "flex",
+    alignItems: "center",
+    minHeight: 44,
   },
   editBtn: {
-    background: theme.accent, color: "#06223a", border: "none",
-    borderRadius: 10, padding: "10px 14px", fontWeight: 700, cursor: "pointer"
+    background: theme.accent,
+    color: "#06223a",
+    border: "none",
+    borderRadius: 10,
+    padding: "10px 14px",
+    fontWeight: 700,
+    cursor: "pointer",
+    marginLeft: 10,
   },
   sectionDivider: { height: 1, background: "rgba(255,255,255,0.06)", margin: "20px 0" },
   credCard: {
-    marginTop: 24, background: theme.card, borderRadius: theme.radius,
-    boxShadow: "0 2px 12px #0006", padding: 24, color: theme.text
+    marginTop: 24,
+    background: theme.card,
+    borderRadius: theme.radius,
+    boxShadow: "0 2px 12px #0006",
+    padding: 24,
+    color: theme.text,
   },
   input: {
-    width: "100%", padding: "12px 14px", borderRadius: 10, border: theme.border,
-    background: theme.cardAlt, color: theme.text, outline: "none", minHeight: 44
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 10,
+    border: theme.border,
+    background: theme.cardAlt,
+    color: theme.text,
+    outline: "none",
+    minHeight: 44,
   },
   row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
-   // Contenedor de la fila (valor + botón)
-  fieldRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    width: "100%",
-  },
-
-  // La “celda” ahora ocupa todo el ancho de la card
-  valueRow: {
-    flex: 1,                // <<< clave para ocupar todo el ancho disponible
+  fieldRow: { display: "flex", alignItems: "center", gap: 12, width: "100%" },
+  valueRowFlex: {
+    flex: 1,
     width: "100%",
     background: theme.cardAlt,
     borderRadius: 12,
@@ -139,10 +154,8 @@ const styles = {
     alignItems: "center",
     wordBreak: "break-word",
   },
-
-  // Botón aparece al final a la derecha
-  editBtn: {
-    marginLeft: "auto",     // <<< empuja el botón a la derecha
+  editBtnRight: {
+    marginLeft: "auto",
     background: theme.accent,
     color: "#06223a",
     border: "none",
@@ -157,30 +170,63 @@ const styles = {
 export default function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [original, setOriginal] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [savingCredential, setSavingCredential] = useState(false);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [credentials, setCredentials] = useState([]);
+  const [loadingCredentials, setLoadingCredentials] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
-    surname: '',
-    email: '',
-    birthdate: '',
-    personalIdType: '',
-    personalId: '',
-    phoneNumber: '',
+    name: "",
+    surname: "",
+    email: "",
+    birthdate: "",
+    personalIdType: "",
+    personalId: "",
+    phoneNumber: "",
+    countryCode: "+598", // Código de país por defecto
     provider: false,
-    credentialTitle: '',
-    credentialImageUrl: '',
-    credentialDescription: '',
-    credentialIssuer: '',
-    credentialDate: ''
+    credentialTitle: "",
+    credentialImageUrl: "",
+    credentialDescription: "",
+    credentialIssuer: "",
+    credentialDate: "",
+    credentialExpiryDate: "",
   });
+
+  // Lista de países disponibles
+  const countries = [
+    { code: "+598", name: "Uruguay", flag: "🇺🇾" },
+    { code: "+54", name: "Argentina", flag: "🇦🇷" },
+    { code: "+55", name: "Brasil", flag: "🇧🇷" },
+    { code: "+1", name: "Estados Unidos", flag: "🇺🇸" },
+    { code: "+34", name: "España", flag: "🇪🇸" },
+  ];
+
   const API = import.meta.env.VITE_API_URL;
 
-  // cleanup de la preview
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
-  // Upload con preview inmediata
+  // ========= Función para cargar credenciales =========
+  const loadCredentials = async () => {
+    const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
+    try {
+      const res = await fetch(`${API}/api/credential/all`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("No se pudieron cargar las credenciales");
+      const data = await res.json();
+      setCredentials(data || []);
+    } catch (err) {
+      console.error("Error al cargar credenciales:", err);
+      setCredentials([]);
+    } finally {
+      setLoadingCredentials(false);
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -192,15 +238,16 @@ export default function Profile() {
     form.append("upload_preset", "YOUR_UPLOAD_PRESET");
 
     try {
-      const res = await fetch("https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload", { method: "POST", body: form });
+      const res = await fetch("https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload", {
+        method: "POST",
+        body: form,
+      });
       if (!res.ok) throw new Error("Falló la subida");
       const data = await res.json();
       if (data.secure_url) {
         setUser((prev) => ({ ...prev, profilePhoto: data.secure_url }));
         URL.revokeObjectURL(objectUrl);
         setPreview(null);
-        // opcional: persistir en tu backend con PATCH
-        // await fetch(`${API}/api/user/me`, { method:"PATCH", headers:{...}, body: JSON.stringify({ profilePhoto: data.secure_url })})
       }
     } catch (err) {
       console.error(err);
@@ -208,49 +255,308 @@ export default function Profile() {
     }
   };
 
-  // Cargar usuario y llenar formData
   useEffect(() => {
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
     let email = "";
-    try { if (token) email = JSON.parse(atob(token.split(".")[1])).sub || JSON.parse(atob(token.split(".")[1])).email || ""; } catch {}
-    if (!email) { setError("No se encontró el email en el token"); setLoading(false); return; }
+    try {
+      if (token) {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        email = payload.sub || payload.email || "";
+      }
+    } catch {}
+    if (!email) {
+      setError("No se encontró el email en el token");
+      setLoading(false);
+      return;
+    }
 
-    fetch(`${API}/api/user/email/${email}`, { headers: { Authorization: `Bearer ${token}` }})
-      .then(r => { if (!r.ok) throw new Error("No se pudo obtener el usuario"); return r.json(); })
-      .then(d => { 
-        setUser(d); 
-        setFormData({
-          name: d.name || '',
-          surname: d.surname || '',
-          email: d.email || '',
-          birthdate: d.birthdate || '',
-          personalIdType: d.personalIdType || '',
-          personalId: d.personalId || '',
-          phoneNumber: d.phoneNumber || '',
-          provider: d.provider || false,
-          credentialTitle: '',
-          credentialImageUrl: '',
-          credentialDescription: '',
-          credentialIssuer: '',
-          credentialDate: ''
-        });
-        setLoading(false); 
+    fetch(`${API}/api/user/email/${encodeURIComponent(email)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => {
+        if (!r.ok) throw new Error("No se pudo obtener el usuario");
+        return r.json();
       })
-      .catch(e => { setError(e.message); setLoading(false); });
+      .then((d) => {
+        setUser(d);
+        
+        // Extraer código de país y número del teléfono completo
+        let countryCode = "+598"; // Por defecto Uruguay
+        let phoneNumber = d.phoneNumber || "";
+        
+        if (d.phoneNumber) {
+          // Buscar el código de país que coincida
+          const matchedCountry = countries.find(country => 
+            d.phoneNumber.startsWith(country.code)
+          );
+          
+          if (matchedCountry) {
+            countryCode = matchedCountry.code;
+            phoneNumber = d.phoneNumber.substring(matchedCountry.code.length);
+          }
+        }
+
+        setOriginal({
+          name: d.name || "",
+          surname: d.surname || "",
+          email: d.email || "",
+          phoneNumber: d.phoneNumber || "", // Guardar el número completo
+          provider: d.provider || false,
+        });
+        
+        setFormData({
+          name: d.name || "",
+          surname: d.surname || "",
+          email: d.email || "",
+          birthdate: d.birthdate || "",
+          personalIdType: d.personalIdType || "",
+          personalId: d.personalId || "",
+          phoneNumber: phoneNumber, // Solo el número sin código
+          countryCode: countryCode, // El código de país separado
+          provider: d.provider || false,
+          credentialTitle: "",
+          credentialImageUrl: "",
+          credentialDescription: "",
+          credentialIssuer: "",
+          credentialDate: "",
+          credentialExpiryDate: "",
+        });
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
+
+    // Cargar credenciales
+    loadCredentials();
   }, []);
 
   const handleInputChange = (id, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [id]: value
-    }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Guardando cambios...");
-    // Aquí iría la lógica para enviar al backend
+  // Función para manejar el cambio de país en PhoneField
+  const handleCountryChange = (countryCode) => {
+    setFormData(prev => ({ ...prev, countryCode }));
   };
+
+  // Función para combinar código de país + número
+  const getFullPhoneNumber = () => {
+    if (!formData.phoneNumber) return formData.countryCode;
+    return `${formData.countryCode}${formData.phoneNumber}`;
+  };
+
+  // Helper PATCH que relee el token y acepta ApiResponse o AuthResponse
+  async function patchJson(path, payload) {
+    const liveToken = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
+    console.log("[PATCH] ->", path, payload);
+    const res = await fetch(`${API}${path}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${liveToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      let msg;
+      try {
+        msg = await res.text();
+      } catch {
+        msg = `HTTP ${res.status}`;
+      }
+      console.error("[PATCH][FAIL]", path, res.status, text);
+      throw new Error(msg || `HTTP ${res.status}`);
+    }
+    const text = await res.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { message: text };
+    }
+  }
+
+  const handleProviderChange = async (newProviderValue) => {
+    if (!newProviderValue || user.provider) {
+      handleInputChange("provider", newProviderValue);
+      return;
+    }
+
+    const confirmed = confirm("¿Estás seguro de que quieres registrarte como proveedor de servicios?");
+    if (!confirmed) {
+      return; 
+    }
+
+    try {
+      const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
+      const res = await fetch(`${API}/api/provider`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || `HTTP ${res.status}`);
+      }
+
+      const response = await res.json();
+      console.log("Provider response:", response);
+      
+      handleInputChange("provider", true);
+      setUser(prev => ({ ...prev, provider: true }));
+      setOriginal(prev => ({ ...prev, provider: true }));
+      
+      alert("Te has registrado como proveedor de servicios exitosamente");
+
+    } catch (error) {
+      console.error("Error al registrarse como provider:", error);
+      alert("Error al registrarse como proveedor: " + error.message);
+      handleInputChange("provider", false);
+    }
+  };
+
+  const handleAddCredential = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
+  
+    if (!formData.credentialTitle || !formData.credentialIssuer || !formData.credentialDate) {
+      alert("Por favor completa los campos obligatorios: Título, Emisor y Fecha de emisión");
+      return;
+    }
+
+    setSavingCredential(true);
+
+    try {
+      const credentialPayload = {
+        name: formData.credentialTitle,
+        issuer: formData.credentialIssuer,
+        description: formData.credentialDescription,
+        validUntil: formData.credentialExpiryDate || null,
+        issuedAt: formData.credentialDate,
+        startedAt: formData.credentialDate,
+        completedAt: formData.credentialDate,
+        certificateUrl: formData.credentialImageUrl || null,
+        credentialStatus: "VERIFIED"
+      };
+
+      const res = await fetch(`${API}/api/credential`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(credentialPayload),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || `HTTP ${res.status}`);
+      }
+
+      const newCredential = await res.json();
+      
+      setCredentials(prev => [...prev, newCredential]);
+      
+      setFormData(prev => ({
+        ...prev,
+        credentialTitle: "",
+        credentialImageUrl: "",
+        credentialDescription: "",
+        credentialIssuer: "",
+        credentialDate: "",
+        credentialExpiryDate: "",
+      }));
+
+      alert("Credencial agregada correctamente");
+
+    } catch (err) {
+      console.error("Error al agregar credencial:", err);
+      alert("Error al agregar credencial: " + err.message);
+    } finally {
+      setSavingCredential(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!original) return;
+
+    setSaving(true);
+
+    // Normalización
+    const name = (formData.name ?? "").trim();
+    const surname = (formData.surname ?? "").trim();
+    const email = (formData.email ?? "").trim();
+    const fullPhoneNumber = getFullPhoneNumber().trim();
+    const originalFullPhone = (original.phoneNumber ?? "").trim();
+
+    // Tareas: ojo con las claves que espera tu backend (ajustá si usa firstName/lastName)
+    const tasks = [];
+    if (name !== (original.name ?? "")) {
+      tasks.push({ field: "name", promise: patchJson("/api/user/name", { name }) });
+    }
+    if (surname !== (original.surname ?? "")) {
+      tasks.push({ field: "surname", promise: patchJson("/api/user/surname", { surname }) });
+    }
+    if (email !== (original.email ?? "")) {
+      tasks.push({ field: "email", promise: patchJson("/api/user/email", { email }) });
+    }
+    if (fullPhoneNumber !== originalFullPhone) {
+      tasks.push({ field: "phoneNumber", promise: patchJson("/api/user/phone", { phoneNumber: fullPhoneNumber }) });
+    }
+
+    if (tasks.length === 0) {
+      alert("No hay cambios para guardar");
+      setSaving(false);
+      return;
+    }
+
+    try {
+      const results = await Promise.allSettled(tasks.map(t => t.promise));
+
+      const successfulFields = [];
+      const failedFields = [];
+
+      results.forEach((r, i) => {
+        const field = tasks[i].field;
+        if (r.status === "fulfilled") successfulFields.push(field);
+        else failedFields.push({ field, error: r.reason?.message || String(r.reason) });
+      });
+
+      // ✅ Actualizar SOLO los campos que realmente se guardaron
+      if (successfulFields.length > 0) {
+        const newOriginal = { ...original };
+        const newUser = user ? { ...user } : user;
+
+        for (const f of successfulFields) {
+          if (f === "name") { newOriginal.name = name; if (newUser) newUser.name = name; }
+          if (f === "surname") { newOriginal.surname = surname; if (newUser) newUser.surname = surname; }
+          if (f === "email") { newOriginal.email = email; if (newUser) newUser.email = email; }
+          if (f === "phoneNumber") { newOriginal.phoneNumber = fullPhoneNumber; if (newUser) newUser.phoneNumber = fullPhoneNumber; }
+        }
+
+        setOriginal(newOriginal);
+        setUser(newUser);
+      }
+
+      if (failedFields.length === 0) {
+        alert("Todos los cambios guardados correctamente");
+      } else {
+        console.error("Fallaron:", failedFields);
+        const msg = failedFields.map(f => `• ${f.field}: ${f.error}`).join("\n");
+        alert(`${successfulFields.length} de ${tasks.length} cambios guardados.\nFallaron:\n${msg}`);
+      }
+    } catch (err) {
+      console.error("💥 Error inesperado:", err);
+      alert("💥 Error inesperado al guardar. Revisá la consola.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
 
   if (loading) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Cargando…</div>;
   if (error) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Error: {error}</div>;
@@ -258,13 +564,13 @@ export default function Profile() {
 
   return (
     <div style={styles.page}>
-      
-      
+      <ProfileNavbar />
+
       <div style={styles.container}>
         {/* Card principal con información personal */}
         <Card>
-          <div style={styles.sectionTitle}>Información Personal</div>
-          
+          <div style={styles.sectionTitle}>Perfil del Usuario</div>
+
           {/* Avatar */}
           <div style={styles.avatarBox}>
             {preview || user?.profilePhoto ? (
@@ -283,10 +589,7 @@ export default function Profile() {
               </label>
             )}
             <input id="profile-upload" type="file" accept="image/*" onChange={handleImageUpload} style={{ display: "none" }} />
-            <SubmitButton
-              onClick={() => document.getElementById('profile-upload').click()}
-              style={{ marginTop: 10, width: 'auto' }}
-            >
+            <SubmitButton onClick={() => document.getElementById("profile-upload").click()} style={{ marginTop: 10, width: "auto" }}>
               {preview || user?.profilePhoto ? "Cambiar foto" : "Subir foto"}
             </SubmitButton>
           </div>
@@ -297,14 +600,14 @@ export default function Profile() {
                 id="name"
                 label="Nombre"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="Ingrese su nombre"
               />
               <InputField
                 id="surname"
                 label="Apellido"
                 value={formData.surname}
-                onChange={(e) => handleInputChange('surname', e.target.value)}
+                onChange={(e) => handleInputChange("surname", e.target.value)}
                 placeholder="Ingrese su apellido"
               />
             </div>
@@ -315,14 +618,16 @@ export default function Profile() {
                 label="Email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Ingrese su email"
+                disabled={false}
               />
-              <DateField
-                id="birthdate"
-                label="Fecha de nacimiento"
-                value={formData.birthdate}
-                onChange={(e) => handleInputChange('birthdate', e.target.value)}
+              <DateField 
+                id="birthdate" 
+                label="Fecha de nacimiento" 
+                value={formData.birthdate} 
+                onChange={(e) => handleInputChange("birthdate", e.target.value)}
+                disabled={true}
               />
             </div>
 
@@ -331,20 +636,21 @@ export default function Profile() {
                 id="personalIdType"
                 label="Tipo de ID"
                 value={formData.personalIdType}
-                onChange={(e) => handleInputChange('personalIdType', e.target.value)}
+                onChange={(e) => handleInputChange("personalIdType", e.target.value)}
                 options={[
-                  { value: '', label: 'Seleccione tipo de ID' },
-                  { value: 'cedula', label: 'Cédula' },
-                  { value: 'pasaporte', label: 'Pasaporte' },
-                  { value: 'dni', label: 'DNI' }
+                  { value: "cedula", label: "Cédula" },
+                  { value: "pasaporte", label: "Pasaporte" },
+                  { value: "dni", label: "DNI" },
                 ]}
+                disabled={true}
               />
               <InputField
                 id="personalId"
                 label="Número de ID"
                 value={formData.personalId}
-                onChange={(e) => handleInputChange('personalId', e.target.value)}
+                onChange={(e) => handleInputChange("personalId", e.target.value)}
                 placeholder="Ingrese su número de ID"
+                disabled={true}
               />
             </div>
 
@@ -353,76 +659,194 @@ export default function Profile() {
                 id="phoneNumber"
                 label="Teléfono"
                 value={formData.phoneNumber}
-                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                selectedCountry={formData.countryCode}
+                onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                onCountryChange={handleCountryChange}
                 placeholder="Ingrese su teléfono"
               />
               <SelectField
                 id="provider"
                 label="¿Es proveedor de servicios?"
-                value={formData.provider}
-                onChange={(e) => handleInputChange('provider', e.target.value === 'true')}
+                value={user.provider ? true : formData.provider}
+                onChange={(e) => handleProviderChange(e.target.value === "true")}
                 options={[
-                  { value: false, label: 'No' },
-                  { value: true, label: 'Sí' }
+                  { value: false, label: "No" },
+                  { value: true, label: "Sí" },
                 ]}
+                disabled={user.provider}
               />
             </div>
 
-            <SubmitButton type="submit" style={{ marginTop: 20 }}>
-              Guardar Cambios
+            <SubmitButton type="submit" style={{ marginTop: 20 }} disabled={saving}>
+              {saving ? "Guardando..." : "Guardar Cambios"}
             </SubmitButton>
           </form>
         </Card>
 
-        {/* Card de credenciales */}
+        {/* Card de credenciales existentes */}
+        {!loadingCredentials && credentials.length > 0 && (
+          <Card>
+            <div style={styles.sectionTitle}>Mis Credenciales</div>
+            <div style={{ display: "grid", gap: 16 }}>
+              {credentials.map((credential) => (
+                <div
+                  key={credential.id}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "80px 1fr",
+                    gap: 16,
+                    padding: 16,
+                    background: theme.cardAlt,
+                    borderRadius: 12,
+                    border: theme.border,
+                  }}
+                >
+                  {/* Imagen/Logo de la credencial */}
+                  <div
+                    style={{
+                      width: 80,
+                      height: 80,
+                      background: theme.card,
+                      borderRadius: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: `1px solid ${theme.accent}`,
+                    }}
+                  >
+                    {credential.certificateUrl ? (
+                      <img
+                        src={credential.certificateUrl}
+                        alt={credential.name}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: 8,
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                          e.currentTarget.nextElementSibling.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      style={{
+                        display: credential.certificateUrl ? "none" : "flex",
+                        color: theme.textSoft,
+                        fontSize: 12,
+                        textAlign: "center",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      📜
+                    </div>
+                  </div>
+
+                  {/* Información de la credencial */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <h4 style={{ margin: 0, color: theme.text, fontSize: 16, fontWeight: 600 }}>
+                      {credential.name}
+                    </h4>
+                    <p style={{ margin: 0, color: theme.textSoft, fontSize: 14 }}>
+                      <strong>Emisor:</strong> {credential.issuer}
+                    </p>
+                    {credential.description && (
+                      <p style={{ margin: 0, color: theme.textSoft, fontSize: 13 }}>
+                        {credential.description}
+                      </p>
+                    )}
+                    <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12, color: theme.textSoft }}>
+                      <span>
+                        <strong>Emitida:</strong> {new Date(credential.issuedAt).toLocaleDateString('es-ES')}
+                      </span>
+                      {credential.validUntil && (
+                        <span>
+                          <strong>Vence:</strong> {new Date(credential.validUntil).toLocaleDateString('es-ES')}
+                        </span>
+                      )}
+                      <span
+                        style={{
+                          background: credential.credentialStatus === 'VERIFIED' ? '#16a34a' : '#fbbf24',
+                          color: 'white',
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          fontSize: 11,
+                        }}
+                      >
+                        {credential.credentialStatus}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Card de agregar credenciales */}
         <Card>
           <div style={styles.sectionTitle}>Agregar Credencial</div>
-          <form onSubmit={(e) => { e.preventDefault(); alert("Guardar credencial"); }}>
+          <form onSubmit={handleAddCredential}>
+            {/* Título + URL imagen */}
             <div style={styles.gridRow}>
               <InputField
                 id="credentialTitle"
-                label="Título de credencial"
+                label="Título de credencial *"
                 value={formData.credentialTitle}
-                onChange={(e) => handleInputChange('credentialTitle', e.target.value)}
+                onChange={(e) => handleInputChange("credentialTitle", e.target.value)}
                 placeholder="Ej: Electricista profesional"
+                required
               />
               <InputField
                 id="credentialImageUrl"
                 label="URL de imagen (logo)"
                 type="url"
                 value={formData.credentialImageUrl}
-                onChange={(e) => handleInputChange('credentialImageUrl', e.target.value)}
+                onChange={(e) => handleInputChange("credentialImageUrl", e.target.value)}
                 placeholder="https://..."
               />
             </div>
 
+            {/* Descripción */}
             <TextAreaField
               id="credentialDescription"
               label="Descripción"
               value={formData.credentialDescription}
-              onChange={(e) => handleInputChange('credentialDescription', e.target.value)}
+              onChange={(e) => handleInputChange("credentialDescription", e.target.value)}
               placeholder="Breve descripción de la credencial"
-              
             />
 
+            {/* Emisor a todo el ancho */}
+            <InputField
+              id="credentialIssuer"
+              label="Emisor *"
+              value={formData.credentialIssuer}
+              onChange={(e) => handleInputChange("credentialIssuer", e.target.value)}
+              placeholder="Institución emisora"
+              required
+            />
+
+            {/* Fechas lado a lado */}
             <div style={styles.gridRow}>
-              <InputField
-                id="credentialIssuer"
-                label="Emisor"
-                value={formData.credentialIssuer}
-                onChange={(e) => handleInputChange('credentialIssuer', e.target.value)}
-                placeholder="Institución emisora"
-              />
               <DateField
                 id="credentialDate"
-                label="Fecha de emisión"
+                label="Fecha de emisión *"
                 value={formData.credentialDate}
-                onChange={(e) => handleInputChange('credentialDate', e.target.value)}
+                onChange={(e) => handleInputChange("credentialDate", e.target.value)}
+                required
+              />
+              <DateField
+                id="credentialExpiryDate"
+                label="Fecha de vencimiento"
+                value={formData.credentialExpiryDate}
+                onChange={(e) => handleInputChange("credentialExpiryDate", e.target.value)}
               />
             </div>
 
-            <SubmitButton type="submit" style={{ marginTop: 20 }}>
-              Agregar Credencial
+            <SubmitButton type="submit" style={{ marginTop: 20 }} disabled={savingCredential}>
+              {savingCredential ? "Agregando..." : "Agregar Credencial"}
             </SubmitButton>
           </form>
         </Card>
