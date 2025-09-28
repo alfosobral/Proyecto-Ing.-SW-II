@@ -5,10 +5,7 @@ import InputField from "../components/InputField";
 import ServiceCard from "../components/ServiceCard";
 import background from "../assets/WhatsApp Image 2025-09-26 at 08.54.03_6362b8ae.jpg";
 
-
 export default function HomePage() {
-
-
     const [showProfile, setShowProfile] = useState(false);
     // Obtener datos del usuario del token
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
@@ -21,7 +18,6 @@ export default function HomePage() {
     } catch {}
 
     return (
-        
         <div 
             style={{ 
                 minHeight: "100vh",
@@ -38,23 +34,35 @@ export default function HomePage() {
         >
             <Navbar />
 
-            {/* Contenedor de las tarjetas */}
+            {/* Contenedor principal para centrar todo */}
             <div
                 style={{
-                display: "grid",
-                alignItems: "center",
-                gridTemplateColumns: "repeat(3, 1fr)", // 4 columnas iguales
-                gap: "40px",                        // espacio horizontal y vertical
-                padding: "80px 40px",                    // margen superior para que no choque con la navbar
-                justifyContent: "center",
+                    display: "flex",
+                    justifyContent: "center", // Centra horizontalmente
+                    alignItems: "center",     // Centra verticalmente
+                    flex: 1,                  // Ocupa todo el espacio restante
+                    width: "100%",
+                    padding: "40px",
                 }}
             >
-                {/* Render de ejemplo: reemplaza con tu data real */}
-                {Array.from({ length: 12 }).map((_, i) => (
-                <ServiceCard key={i} /* props={...} */ />
-                ))}
+                {/* Contenedor de las tarjetas */}
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(3, 1fr)", // 3 columnas iguales
+                        gap: "130px",                           // espacio entre tarjetas
+                        maxWidth: "1200px",                    // Ancho máximo del grid
+                        width: "100%",                         // Usar todo el ancho disponible
+                        padding: "80px 40px",
+                        justifyItems: "center",                // Centra cada tarjeta en su celda
+                    }}
+                >
+                    {/* Render de ejemplo: reemplaza con tu data real */}
+                    {Array.from({ length: 12 }).map((_, i) => (
+                        <ServiceCard key={i} /* props={...} */ />
+                    ))}
+                </div>
             </div>
-
         </div>
     );
 }
