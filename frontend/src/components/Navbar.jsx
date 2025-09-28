@@ -1,13 +1,18 @@
 import { Link } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import { useState } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+
+
+const NAV_H = "12vh";
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+const DURATION = "500ms";
 
 export default function Navbar() {
-
   const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = () => setMenuOpen(false);
-  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // ← súbelo acá
+
+  const hasToken = Boolean(localStorage.getItem("jwt") || sessionStorage.getItem("jwt"));
 
   function logOut() {
     localStorage.removeItem("jwt");
@@ -18,116 +23,77 @@ export default function Navbar() {
 
   return (
     <nav style={styles.navbar}>
-      {/* Botón hamburguesa y logOut */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%" }}>
-        <button onClick={toggleMenu} style={styles.menuButton} aria-label="Abrir menú">
+        <button onClick={() => setMenuOpen(p => !p)} style={styles.menuButton} aria-label="Abrir menú">
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
-        <div style={{ ...styles.logo, display: "flex", alignItems: "center", height: "100%" }}>
-          <img src="/HurryHandHorizontal.png" alt="HurryHand Logo" style={{ height: "40px", verticalAlign: "middle", display: "block", margin: "0 auto" }} />
-        </div>
       </div>
 
       <SearchBar onSearch={handleSearch} />
 
-
-
-      {/* Overlay (click para cerrar) 
-      <div
-        onClick={closeMenu}
-        style={{
-          ...styles.overlay,
-          pointerEvents: menuOpen ? "auto" : "none",
-          opacity: menuOpen ? 1 : 0,
-        }}
-      />
-      */}
-
+      {/* LEFT PANEL (siempre montado) */}
       <aside
         style={{
-          ...styles.sidePanel,
+          ...styles.panelBase,
+          ...styles.leftPos,
           transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
         }}
         aria-hidden={!menuOpen}
       >
-        <a href="/" style={styles.sideLink} onClick={closeMenu}>Inicio</a>
-        <a href="/servicios" style={styles.sideLink} onClick={closeMenu}>Servicios</a>
-        <a href="/contacto" style={styles.sideLink} onClick={closeMenu}>Contacto</a>
+        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categorias</a>
+        <a href="/servicios" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
+        <a href="/contacto" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Contacto</a>
       </aside>
 
       <div style={styles.actions}>
-        {(() => {
-          const hasToken = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
-          const [dropdownOpen, setDropdownOpen] = useState(false);
-          if (hasToken) {
-            return (
-              <div style={{ position: "relative" }}>
-                <button
-                  onClick={() => setDropdownOpen((open) => !open)}
-                  style={{ ...styles.link, ...styles.button, padding: 0, background: "none", border: "none" }}
-                >
-                  <img src="/src/assets/profile.png" alt="Perfil" style={{ height: "32px", width: "32px", borderRadius: "50%", verticalAlign: "middle" }} />
-                </button>
-                {dropdownOpen && (
-                  <div style={styles.dropdownMenu}>
-                    <button
-                      onClick={() => { window.location.href = '/profile'; setDropdownOpen(false); }}
-                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
-                    >
-                      Ir al perfil
-                    </button>
-                    <button
-                      onClick={() => { window.location.href = '/credential'; setDropdownOpen(false); }}
-                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
-                    >
-                      Mis credenciales
-                    </button>
-                    <button
-                      onClick={logOut}
-                      style={{ ...styles.sideLink, width: "100%", color: "#ffffffff", border: "none", background: "none", textAlign: "left", cursor: "pointer" }}
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          } else {
-            return (
-              <Link to="/login" style={{ ...styles.link, ...styles.button }}>Ingresar</Link>
-            );
-          }
-        })()}
+        {hasToken ? (
+          <>
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setDropdownOpen(o => !o)}
+                style={{ ...styles.button, padding: 12, background: "none", border: "none" }}
+              >
+                <FaUserCircle style={{ fontSize: 32, color: "white" }} />
+              </button>
+            </div>
+
+            {/* RIGHT PANEL (siempre montado) */}
+            <aside
+              style={{
+                ...styles.panelBase,
+                ...styles.rightPos,
+                transform: dropdownOpen ? "translateX(0)" : "translateX(100%)",
+              }}
+              aria-hidden={!dropdownOpen}
+            >
+              <button onClick={() => (window.location.href = "/profile")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
+                Ir al perfil
+              </button>
+              <button onClick={() => (window.location.href = "/credential")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
+                Mis credenciales
+              </button>
+              <button onClick={logOut} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
+                Cerrar sesión
+              </button>
+            </aside>
+          </>
+        ) : (
+          <Link to="/login" style={{ ...styles.button }}>Ingresar</Link>
+        )}
       </div>
     </nav>
   );
 }
 
-function handleSearch(query) {
-  console.log("Buscar:", query);
-}
+function handleSearch(q) { console.log("Buscar:", q); }
 
 const styles = {
-  dropdownMenu: {
-    position: "absolute",
-    top: "110%",
-    right: 0,
-    width: 200,
-    height: "auto",
-    minWidth: 140,
-    zIndex: 1002,
-    boxShadow: "0 2px 8px rgba(6, 6, 39, 0.12)",
-    background: "#34aadc76",
-    borderRadius: 4,
-    willChange: "transform",
-    transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
-  },
   navbar: {
     width: "100%",
-    height: "12vh",
-    background: "rgba(13, 14, 17, 0.35)",
+    height: NAV_H,
+    background: "rgba(225, 220, 220, 0.4)",
     display: "flex",
-    flexdirection: "row",
+    flexDirection: "row", // ← ojo: estaba mal escrito
     alignItems: "center",
     boxShadow: "0 10px 30px rgba(0,0,0,.2)",
     fontFamily: "Montserrat",
@@ -136,56 +102,39 @@ const styles = {
     WebkitBackdropFilter: "blur(5px)",
     padding: "0 40px",
     color: "white",
-    position: "fixed", // siempre arriba
+    position: "fixed",
     top: 0,
     left: 0,
     zIndex: 1000,
   },
-  logo: {
-    fontSize: "20px",
-    fontWeight: "bold",
-    letterSpacing: "1px",
-  },
-  actions: {
-    display: "flex",
-    gap: "16px",
-  },
+
   button: {
-    padding: "6px 14px",
-    backgroundColor: "#34aadcff",
-    borderRadius: "6px",
-  },
-  menuButton: {
-    background: "none",
-    border: "none",
-    color: "#fff",
-    fontSize: 24,
-    cursor: "pointer",
     marginRight: "14px",
-    
+    backgroundColor: "transparent", // ← en CSS no existe "none" para color
+    borderRadius: "6px",
+    padding: "12px",
+    background: "rgba(225, 220, 220, 0.4)",
   },
-   overlay: {
+
+  panelBase: {
     position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,.45)",
-    transition: "opacity 280ms ease",  // fade suave
-    zIndex: 999, // debajo del panel (1001) y arriba de la navbar (1000) si querés
-  },
-  sidePanel: {
-    position: "fixed",
-    top: "12vh", // debajo de la navbar
-    left: 0,
-    height: "88vh",
-    width: 200,
-    background: "#111827",
-    boxShadow: "2px 0 18px rgba(0,0,0,.35)",
+    top: NAV_H,                                        // alinea con navbar
+    height: `calc(100vh - ${NAV_H})`,
+    width: 240,
+    background: "rgba(225, 220, 220, 0.4)",
+    backdropFilter: "blur(5px)",
+    WebkitBackdropFilter: "blur(5px)",
+    boxShadow: "none",
     display: "flex",
     flexDirection: "column",
-    padding: "16px 12px",
+    padding: "12px",
     zIndex: 1001,
-    transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)", // <- EASING
+    transition: `transform ${DURATION} ${EASING}`,     // ← misma animación
     willChange: "transform",
   },
+  leftPos: { left: 0 },
+  rightPos: { right: 0 },
+
   sideLink: {
     color: "#fff",
     textDecoration: "none",
@@ -193,6 +142,15 @@ const styles = {
     borderRadius: 8,
     fontSize: 16,
     transition: "background-color 160ms ease",
-  },  
-};
+    cursor: "pointer",
+  },
 
+  menuButton: {
+    background: "none",
+    border: "none",
+    color: "#fff",
+    fontSize: 24,
+    cursor: "pointer",
+    marginLeft: "14px",
+  },
+};

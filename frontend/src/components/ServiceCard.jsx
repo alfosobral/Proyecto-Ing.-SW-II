@@ -2,16 +2,24 @@ import React from "react";
 import { FaStar } from "react-icons/fa";
 import Card from "./Card";
 
-export default function ServiceCard({ image, rating, name, description, onClick }) {
+export default function ServiceCard({ 
+  image, 
+  rating, 
+  name, 
+  description, 
+  onClick
+}) {
+
   const safeRating = Number.isFinite(rating) ? rating : 0;
-  const rounded = Math.round(safeRating * 10) / 10; // 4.3, 4.8, etc.
+  const rounded = Math.round(safeRating * 10) / 10;
 
   return (
     <Card
       style={{
-        minHeight: "auto",           // 👈 sobreescribe el 100vh del Card base
+        minHeight: "auto",
         padding: 16,
         gap: 12,
+        maxWidth: "300px",
         cursor: onClick ? "pointer" : "default",
       }}
       onClick={onClick}

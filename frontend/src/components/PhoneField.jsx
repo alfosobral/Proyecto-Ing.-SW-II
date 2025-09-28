@@ -74,7 +74,7 @@ export default function PhoneField({
           style={{
             border: "none",
             outline: "none",
-            background: "#ffffff30",
+            background: "white",
             padding: "10px 8px",
             fontSize: 14,
             cursor: "pointer",
@@ -103,7 +103,7 @@ export default function PhoneField({
             outline: "none",
             padding: "10px 12px",
             fontSize: 14,
-            background: "#ffffff30",
+            background: "ffffff77",
             boxSizing: "border-box",
           }}
           {...props}

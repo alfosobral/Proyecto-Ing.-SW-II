@@ -44,8 +44,11 @@ const styles = {
   form: {
     display: "flex",
     alignItems: "center",
-    backgroundColor: "#2d2e3bff",
-    borderRadius: 8,
+    background: "rgba(225, 220, 220, 0.4)",
+    backdropFilter: "blur(5px)",
+    WebkitBackdropFilter: "blur(5px)",
+    boxShadow: "0 10px 30px rgba(0,0,0,.2)",  
+    borderRadius: 12,
     overflow: "hidden",
   },
   input: {
@@ -54,7 +57,7 @@ const styles = {
     outline: "none",
     padding: "8px 12px",
     fontSize: 14,
-    background: "#2d3341ff",
+    background: "none",
     color: "#fff",
   },
   button: {
@@ -62,7 +65,7 @@ const styles = {
     outline: "none",
     padding: "8px 12px",
     cursor: "pointer",
-    background: "#2d3341ff",
+    background: "none",
     color: "#fff",
     display: "flex",
     alignItems: "center",
