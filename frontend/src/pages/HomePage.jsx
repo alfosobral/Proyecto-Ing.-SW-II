@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Card from "../components/Card";
 import InputField from "../components/InputField";
 import ServiceCard from "../components/ServiceCard";
-import background from "../assets/WhatsApp Image 2025-09-26 at 08.54.03_6362b8ae.jpg";
+import background from "../assets/Background.png";
 
 export default function HomePage() {
     const [showProfile, setShowProfile] = useState(false);

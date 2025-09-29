@@ -182,6 +182,7 @@ export default function Profile() {
     name: "",
     surname: "",
     email: "",
+    password: "",
     birthdate: "",
     personalIdType: "",
     personalId: "",
@@ -415,25 +416,28 @@ export default function Profile() {
   const handleAddCredential = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
-  
+
     if (!formData.credentialTitle || !formData.credentialIssuer || !formData.credentialDate) {
-      alert("Por favor completa los campos obligatorios: Título, Emisor y Fecha de emisión");
+      alert("Por favor completa: Título, Emisor y Fecha de emisión");
+      return;
+    }
+    if (!user?.provider) {
+      alert("Debes ser proveedor para agregar credenciales. Activa el modo proveedor y vuelve a iniciar sesión si es necesario.");
       return;
     }
 
     setSavingCredential(true);
-
     try {
-      const credentialPayload = {
+      const payload = {
         name: formData.credentialTitle,
         issuer: formData.credentialIssuer,
-        description: formData.credentialDescription,
+        description: formData.credentialDescription || null,
         validUntil: formData.credentialExpiryDate || null,
         issuedAt: formData.credentialDate,
         startedAt: formData.credentialDate,
         completedAt: formData.credentialDate,
         certificateUrl: formData.credentialImageUrl || null,
-        credentialStatus: "VERIFIED"
+        credentialStatus: "VERIFIED",
       };
 
       const res = await fetch(`${API}/api/credential`, {
@@ -442,18 +446,21 @@ export default function Profile() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(credentialPayload),
+        body: JSON.stringify(payload),
       });
 
+      if (res.status === 401 || res.status === 403) {
+        alert("No tienes permisos para crear credenciales. Asegúrate de tener el rol PROVIDER (re-inicia sesión si te acabas de registrar).");
+        return;
+      }
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(errorText || `HTTP ${res.status}`);
       }
 
-      const newCredential = await res.json();
-      
-      setCredentials(prev => [...prev, newCredential]);
-      
+      const created = await res.json();                 // ← ahora viene el DTO
+      setCredentials(prev => [...prev, created]);       // ← lo agregás al listado
+
       setFormData(prev => ({
         ...prev,
         credentialTitle: "",
@@ -465,7 +472,6 @@ export default function Profile() {
       }));
 
       alert("Credencial agregada correctamente");
-
     } catch (err) {
       console.error("Error al agregar credencial:", err);
       alert("Error al agregar credencial: " + err.message);
@@ -473,6 +479,7 @@ export default function Profile() {
       setSavingCredential(false);
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -497,6 +504,9 @@ export default function Profile() {
     }
     if (email !== (original.email ?? "")) {
       steps.push({ field: "email", run: () => patchJson("/api/user/email", { email }) });
+    }
+    if (email !== (original.password ?? "")) {
+      steps.push({ field: "password", run: () => patchJson("/api/user/password", { password }) });
     }
     if (fullPhoneNumber !== originalFullPhone) {
       steps.push({ field: "phoneNumber", run: () => patchJson("/api/user/phone", { phoneNumber: fullPhoneNumber }) });
@@ -619,7 +629,8 @@ export default function Profile() {
             </div>
 
             <div style={styles.gridRow}>
-              <InputField
+              <div style={styles.fullWidth}>
+                <InputField
                 id="email"
                 label="Email"
                 type="email"
@@ -628,6 +639,22 @@ export default function Profile() {
                 placeholder="Ingrese su email"
                 disabled={true}
               />
+              </div>
+            </div>  
+            <div style={styles.gridRow}>
+              <div style={styles.fullWidth}>
+                <InputField
+                id="password"
+                label="Contraseña"
+                type="password"
+                value={formData.password}
+                onChange={(e) => handleInputChange("password", e.target.value)}
+                placeholder="Ingrese su contraseña"
+                disabled={true}
+              />
+              </div>
+            </div>
+            <div style={styles.gridRow}>
               <DateField 
                 id="birthdate" 
                 label="Fecha de nacimiento" 
@@ -635,8 +662,19 @@ export default function Profile() {
                 onChange={(e) => handleInputChange("birthdate", e.target.value)}
                 disabled={true}
               />
+              <SelectField
+                id="provider"
+                label="¿Es proveedor de servicios?"
+                value={String(user.provider ? true : formData.provider)}
+                onChange={(e) => handleProviderChange(e.target.value === "true")}
+                options={[
+                  { value: false, label: "No" },
+                  { value: true, label: "Sí" },
+                ]}
+                disabled={user.provider}
+              />
             </div>
-
+            
             <div style={styles.gridRow}>
               <SelectField
                 id="personalIdType"
@@ -661,7 +699,8 @@ export default function Profile() {
             </div>
 
             <div style={styles.gridRow}>
-              <PhoneField
+              <div style={styles.fullWidth}>
+                <PhoneField
                 id="phoneNumber"
                 label="Teléfono"
                 value={formData.phoneNumber}
@@ -670,17 +709,7 @@ export default function Profile() {
                 onCountryChange={handleCountryChange}
                 placeholder="Ingrese su teléfono"
               />
-              <SelectField
-                id="provider"
-                label="¿Es proveedor de servicios?"
-                value={user.provider ? true : formData.provider}
-                onChange={(e) => handleProviderChange(e.target.value === "true")}
-                options={[
-                  { value: false, label: "No" },
-                  { value: true, label: "Sí" },
-                ]}
-                disabled={user.provider}
-              />
+              </div>
             </div>
 
             <SubmitButton type="submit" style={{ marginTop: 20 }} disabled={saving}>
@@ -799,7 +828,7 @@ export default function Profile() {
             <div style={styles.gridRow}>
               <InputField
                 id="credentialTitle"
-                label="Título de credencial *"
+                label="Título de credencial"
                 value={formData.credentialTitle}
                 onChange={(e) => handleInputChange("credentialTitle", e.target.value)}
                 placeholder="Ej: Electricista profesional"
@@ -827,7 +856,7 @@ export default function Profile() {
             {/* Emisor a todo el ancho */}
             <InputField
               id="credentialIssuer"
-              label="Emisor *"
+              label="Emisor"
               value={formData.credentialIssuer}
               onChange={(e) => handleInputChange("credentialIssuer", e.target.value)}
               placeholder="Institución emisora"
@@ -838,7 +867,7 @@ export default function Profile() {
             <div style={styles.gridRow}>
               <DateField
                 id="credentialDate"
-                label="Fecha de emisión *"
+                label="Fecha de emisión"
                 value={formData.credentialDate}
                 onChange={(e) => handleInputChange("credentialDate", e.target.value)}
                 required

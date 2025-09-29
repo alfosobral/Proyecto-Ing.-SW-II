@@ -40,9 +40,9 @@ export default function Navbar() {
         }}
         aria-hidden={!menuOpen}
       >
-        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categorias</a>
-        <a href="/servicios" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
+        <a href="/service_post" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
         <a href="/contacto" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Contacto</a>
+        <a href="/calendar" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Mi calendario</a>
       </aside>
 
       <div style={styles.actions}>
@@ -68,9 +68,6 @@ export default function Navbar() {
             >
               <button onClick={() => (window.location.href = "/profile")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
                 Ir al perfil
-              </button>
-              <button onClick={() => (window.location.href = "/credential")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
-                Mis credenciales
               </button>
               <button onClick={logOut} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
                 Cerrar sesión
@@ -121,7 +118,7 @@ const styles = {
     top: NAV_H,                                        // alinea con navbar
     height: `calc(100vh - ${NAV_H})`,
     width: 240,
-    background: "rgba(225, 220, 220, 0.4)",
+    background: "rgba(199, 216, 219, 0.72)",
     backdropFilter: "blur(5px)",
     WebkitBackdropFilter: "blur(5px)",
     boxShadow: "none",
@@ -136,7 +133,7 @@ const styles = {
   rightPos: { right: 0 },
 
   sideLink: {
-    color: "#fff",
+    color: "#7f7d7dff",
     textDecoration: "none",
     padding: "10px 12px",
     borderRadius: 8,
