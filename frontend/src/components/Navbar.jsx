@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import { useState } from "react";
 import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
-
+import { useAuth } from "../auth/AuthContext";
 
 const NAV_H = "12vh";
 const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -10,28 +10,24 @@ const DURATION = "500ms";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // ← súbelo acá
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { isAuth, logout } = useAuth();
 
-  const hasToken = Boolean(localStorage.getItem("jwt") || sessionStorage.getItem("jwt"));
-
-  function logOut() {
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("jwt_expires");
-    sessionStorage.removeItem("jwt");
+  const handleLogout = () => {
+    logout();
     window.location.href = "/login";
-  }
+  };
 
   return (
     <nav style={styles.navbar}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%" }}>
-        <button onClick={() => setMenuOpen(p => !p)} style={styles.menuButton} aria-label="Abrir menú">
+        <button onClick={() => setMenuOpen((prev) => !prev)} style={styles.menuButton} aria-label="Abrir men�">
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
       </div>
 
       <SearchBar onSearch={handleSearch} />
 
-      {/* LEFT PANEL (siempre montado) */}
       <aside
         style={{
           ...styles.panelBase,
@@ -40,24 +36,24 @@ export default function Navbar() {
         }}
         aria-hidden={!menuOpen}
       >
+        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categor�as</a>
         <a href="/service_post" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
         <a href="/contacto" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Contacto</a>
         <a href="/calendar" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Mi calendario</a>
       </aside>
 
       <div style={styles.actions}>
-        {hasToken ? (
+        {isAuth ? (
           <>
             <div style={{ position: "relative" }}>
               <button
-                onClick={() => setDropdownOpen(o => !o)}
+                onClick={() => setDropdownOpen((open) => !open)}
                 style={{ ...styles.button, padding: 12, background: "none", border: "none" }}
               >
                 <FaUserCircle style={{ fontSize: 32, color: "white" }} />
               </button>
             </div>
 
-            {/* RIGHT PANEL (siempre montado) */}
             <aside
               style={{
                 ...styles.panelBase,
@@ -69,8 +65,11 @@ export default function Navbar() {
               <button onClick={() => (window.location.href = "/profile")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
                 Ir al perfil
               </button>
-              <button onClick={logOut} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
-                Cerrar sesión
+              <button onClick={() => (window.location.href = "/credential")} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
+                Mis credenciales
+              </button>
+              <button onClick={handleLogout} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
+                Cerrar sesi�n
               </button>
             </aside>
           </>
@@ -82,7 +81,9 @@ export default function Navbar() {
   );
 }
 
-function handleSearch(q) { console.log("Buscar:", q); }
+function handleSearch(q) {
+  console.log("Buscar:", q);
+}
 
 const styles = {
   navbar: {
@@ -90,7 +91,7 @@ const styles = {
     height: NAV_H,
     background: "rgba(225, 220, 220, 0.4)",
     display: "flex",
-    flexDirection: "row", // ← ojo: estaba mal escrito
+    flexDirection: "row",
     alignItems: "center",
     boxShadow: "0 10px 30px rgba(0,0,0,.2)",
     fontFamily: "Montserrat",
@@ -105,17 +106,25 @@ const styles = {
     zIndex: 1000,
   },
 
+  actions: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+  },
+
   button: {
     marginRight: "14px",
-    backgroundColor: "transparent", // ← en CSS no existe "none" para color
+    backgroundColor: "transparent",
     borderRadius: "6px",
     padding: "12px",
     background: "rgba(225, 220, 220, 0.4)",
+    color: "white",
+    textDecoration: "none",
   },
 
   panelBase: {
     position: "fixed",
-    top: NAV_H,                                        // alinea con navbar
+    top: NAV_H,
     height: `calc(100vh - ${NAV_H})`,
     width: 240,
     background: "rgba(199, 216, 219, 0.72)",
@@ -126,7 +135,7 @@ const styles = {
     flexDirection: "column",
     padding: "12px",
     zIndex: 1001,
-    transition: `transform ${DURATION} ${EASING}`,     // ← misma animación
+    transition: `transform ${DURATION} ${EASING}`,
     willChange: "transform",
   },
   leftPos: { left: 0 },

@@ -11,6 +11,7 @@ import InputField from "../components/InputField";
 import CheckboxField from "../components/CheckboxField";
 import DateField from "../components/DateField";
 import SelectField from "../components/SelectField";
+import { createServicePost, uploadServicePostPhoto } from "../services/servicePosts";
 
 // TODO: promover a componentes compartidos
 // - TextAreaField (textarea con etiqueta y estilos)
@@ -24,6 +25,22 @@ import back3 from "../assets/RegisterBackground3.png";
 import back4 from "../assets/RegisterBackground4.png";
 import back5 from "../assets/RegisterBackground5.png";
 import back6 from "../assets/RegisterBackground6.png";
+
+async function uploadPortfolioFiles(files) {
+  if (!Array.isArray(files) || files.length === 0) {
+    return [];
+  }
+
+  const uploadedUrls = [];
+  for (const file of files) {
+    if (!file) continue;
+    const url = await uploadServicePostPhoto(file);
+    if (url) {
+      uploadedUrls.push(url);
+    }
+  }
+  return uploadedUrls;
+}
 
 // ------------------------------------------------------------------
 // Constantes y helpers
@@ -56,8 +73,27 @@ const DAYS = [
 const HOURS = Array.from({ length: 24 - 6 }, (_, i) => 6 + i); // 6..23
 
 const URU_DEPARTMENTS = [
-  "Artigas","Canelones","Cerro Largo","Colonia","Durazno","Flores","Florida","Lavalleja","Maldonado","Montevideo","Paysandú","Río Negro","Rivera","Rocha","Salto","San José","Soriano","Tacuarembó","Treinta y Tres"
-].map(d => ({ value: String(d), label: d }));
+  { value: "ARTIGAS", label: "Artigas" },
+  { value: "CANELONES", label: "Canelones" },
+  { value: "CERRO_LARGO", label: "Cerro Largo" },
+  { value: "COLONIA", label: "Colonia" },
+  { value: "DURAZNO", label: "Durazno" },
+  { value: "FLORES", label: "Flores" },
+  { value: "FLORIDA", label: "Florida" },
+  { value: "LAVALLEJA", label: "Lavalleja" },
+  { value: "MALDONADO", label: "Maldonado" },
+  { value: "MONTEVIDEO", label: "Montevideo" },
+  { value: "PAYSANDU", label: "Paysandu" },
+  { value: "RIO_NEGRO", label: "Rio Negro" },
+  { value: "RIVERA", label: "Rivera" },
+  { value: "ROCHA", label: "Rocha" },
+  { value: "SALTO", label: "Salto" },
+  { value: "SAN_JOSE", label: "San Jose" },
+  { value: "SORIANO", label: "Soriano" },
+  { value: "TACUAREMBO", label: "Tacuarembo" },
+  { value: "TREINTA_Y_TRES", label: "Treinta y Tres" },
+];
+const DAY_INDEX_TO_KEY = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
 // eslint-disable-next-line no-unused-vars
 function formatHM(h, m = 0) {
@@ -275,7 +311,9 @@ export default function ServicePost() {
     return () => clearInterval(t);
   }, []);
 
-  const next = () => {
+  const next = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
     setAttemptedNext(true);
     const hasErrors = Object.keys(validate(form, step)).length > 0;
     if (hasErrors) return;
@@ -285,7 +323,9 @@ export default function ServicePost() {
     setAttemptedNext(false);
   };
   
-  const backStep = () => {
+  const backStep = (event) => {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
     setDirection(-1);
     setStep((s) => Math.max(s - 1, 0));
     setTouched({});
@@ -299,16 +339,10 @@ export default function ServicePost() {
     if (hasErrors) return;
 
     // construir payload coherente con estilo del proyecto
-    const payload = toBackendPayload(form);
-    const API = import.meta.env.VITE_API_URL;
+    const photoUrls = await uploadPortfolioFiles(form.portfolio);
+    const payload = toBackendPayload(form, photoUrls);
     try {
-      const res = await fetch(`${API}/api/service`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      // éxito
+      await createServicePost(payload);
       navigate("/services/mine");
     } catch (err) {
       console.error("Error al publicar servicio:", err);
@@ -555,26 +589,102 @@ function StepPortfolioAndLocation({ form, onChange }) {
 // ------------------------------------------------------------------
 // Payload (alineado a convención del backend del proyecto)
 // ------------------------------------------------------------------
-function toBackendPayload(form) {
-  const normalizeWeekly = Object.fromEntries(
-    Object.entries(form.weeklySlots || {}).map(([k, arr]) => [k, (arr || []).map(Number)])
+function toBackendPayload(form, photoUrls = []) {
+  const normalizedSlots = Object.fromEntries(
+    Object.entries(form.weeklySlots || {}).map(([key, hours]) => [
+      key,
+      (hours || [])
+        .map((hour) => Number(hour))
+        .filter((value) => Number.isInteger(value) && value >= 0 && value <= 23),
+    ])
   );
+
   return {
-    title: form.title,
-    description: form.description,
-    estimated_minutes: Number(form.xMinutes || 0),
-    rate_per_hour_uyu: Number(form.rate || 0),
-    valid_until: form.validUntil || null, // yyyy-mm-dd
-    weekly_slots: normalizeWeekly,       // { mon: [6, 12, ...], ... }
-    location: form.addLocation ? {
-      department: form.location.department,
-      city: form.location.city,
-      street: form.location.street,
-      door_number: form.location.doorNumber,
-      postal_code: form.location.postalCode,
-      apartment: form.location.apartment || null,
-    } : null,
+    title: form.title.trim(),
+    description: form.description.trim(),
+    price: Number(form.rate || 0),
+    durationInMinutes: Number(form.xMinutes || 0),
+    availableDates: buildAvailableDates(normalizedSlots, form.validUntil),
+    photosURLs: Array.isArray(photoUrls) ? photoUrls : [],
+    location: form.addLocation ? normalizeLocationForBackend(form.location) : null,
   };
+}
+
+function normalizeLocationForBackend(rawLocation) {
+  if (!rawLocation) return null;
+
+  const departamento = (rawLocation.department || '').trim();
+  const location = {
+    departamento: departamento || null,
+    neighbourhood: blankToNull(rawLocation.city),
+    street: blankToNull(rawLocation.street),
+    streetNumber: numberOrNull(rawLocation.doorNumber),
+    postalCode: numberOrNull(rawLocation.postalCode),
+    aptoNumber: numberOrNull(rawLocation.apartment),
+  };
+
+  const hasAnyValue = Object.values(location).some((value) => value !== null);
+  return hasAnyValue ? location : null;
+}
+
+function blankToNull(value) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function numberOrNull(value) {
+  if (value === undefined || value === null || value === '') return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function buildAvailableDates(weeklySlots, validUntil) {
+  const result = [];
+  const hasSlotsSelected = Object.values(weeklySlots).some((hours) => Array.isArray(hours) && hours.length > 0);
+  if (!hasSlotsSelected) {
+    return result;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let endDate;
+  if (validUntil) {
+    const parsed = new Date(validUntil);
+    if (!Number.isNaN(parsed.getTime())) {
+      parsed.setHours(23, 59, 59, 999);
+      endDate = parsed;
+    }
+  }
+  if (!endDate) {
+    endDate = new Date(today);
+    endDate.setDate(endDate.getDate() + 14);
+    endDate.setHours(23, 59, 59, 999);
+  }
+
+  for (let cursor = new Date(today); cursor <= endDate; cursor.setDate(cursor.getDate() + 1)) {
+    const dayKey = DAY_INDEX_TO_KEY[cursor.getDay()];
+    const hours = weeklySlots[dayKey] || [];
+    for (const hour of hours) {
+      const slotDate = new Date(cursor);
+      slotDate.setHours(hour, 0, 0, 0);
+      result.push(formatLocalDateTime(slotDate));
+      if (result.length >= 200) {
+        return result;
+      }
+    }
+  }
+
+  return result;
+}
+
+function formatLocalDateTime(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:00:00`;
 }
 
 // ------------------------------------------------------------------
@@ -738,3 +848,11 @@ function titleByStep(step) {
   if (step === 1) return "Publicar servicio";
   return "Publicar servicio";
 }
+
+
+
+
+
+
+
+
