@@ -1,4 +1,4 @@
-﻿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import { useState } from "react";
 import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
@@ -21,7 +21,7 @@ export default function Navbar() {
   return (
     <nav style={styles.navbar}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, height: "100%" }}>
-        <button onClick={() => setMenuOpen((prev) => !prev)} style={styles.menuButton} aria-label="Abrir menú">
+        <button onClick={() => setMenuOpen((prev) => !prev)} style={styles.menuButton} aria-label="Abrir men\u00fa">
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
       </div>
@@ -36,7 +36,7 @@ export default function Navbar() {
         }}
         aria-hidden={!menuOpen}
       >
-        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categorías</a>
+        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categor\u00edas</a>
         <a href="/service_post" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
         <a href="/contacto" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Contacto</a>
         <a href="/calendar" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Mi calendario</a>
@@ -69,7 +69,7 @@ export default function Navbar() {
                 Mis credenciales
               </button>
               <button onClick={handleLogout} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
-                Cerrar sesión
+                Cerrar sesi\u00f3n
               </button>
             </aside>
           </>

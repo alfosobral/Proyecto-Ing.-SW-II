@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
@@ -33,6 +33,8 @@ export default function HomePage() {
   });
 
   const posts = data?.content ?? [];
+  const bullet = "\u2022";
+  const noServicesMessage = `Todav\u00eda no hay servicios publicados.`;
 
   return (
     <div
@@ -83,12 +85,12 @@ export default function HomePage() {
 
           {!isLoading && !isError && posts.length === 0 && (
             <div style={{ gridColumn: "1 / -1", color: "white", textAlign: "center" }}>
-              Todavía no hay servicios publicados.
+              {noServicesMessage}
             </div>
           )}
 
           {posts.map((post) => {
-            const description = `${formatPrice(post.price)} • ${formatDuration(post.duration)}`;
+            const description = `${formatPrice(post.price)} ${bullet} ${formatDuration(post.duration)}`;
             const image = Array.isArray(post.photosURLs) && post.photosURLs.length > 0 ? post.photosURLs[0] : undefined;
             return (
               <ServiceCard
