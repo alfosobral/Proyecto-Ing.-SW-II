@@ -50,7 +50,7 @@ export default function HomePage() {
                     style={{
                         display: "grid",
                         gridTemplateColumns: "repeat(3, 1fr)", // 3 columnas iguales
-                        gap: "130px",                           // espacio entre tarjetas
+                        gap: "5vw",                           // espacio entre tarjetas
                         maxWidth: "1200px",                    // Ancho máximo del grid
                         width: "100%",                         // Usar todo el ancho disponible
                         padding: "80px 40px",
