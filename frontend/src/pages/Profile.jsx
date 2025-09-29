@@ -350,7 +350,6 @@ export default function Profile() {
   // Helper PATCH que relee el token y acepta ApiResponse o AuthResponse
   async function patchJson(path, payload) {
     const liveToken = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
-    console.log("[PATCH] ->", path, payload);
     const res = await fetch(`${API}${path}`, {
       method: "PATCH",
       headers: {
@@ -359,21 +358,16 @@ export default function Profile() {
       },
       body: JSON.stringify(payload),
     });
+    const raw = await res.text().catch(() => "");
     if (!res.ok) {
-      let msg;
-      try {
-        msg = await res.text();
-      } catch {
-        msg = `HTTP ${res.status}`;
-      }
-      console.error("[PATCH][FAIL]", path, res.status, text);
-      throw new Error(msg || `HTTP ${res.status}`);
+      console.error("[PATCH][FAIL]", path, res.status, raw);
+      const msg = raw || `HTTP ${res.status}`;
+      throw new Error(msg);
     }
-    const text = await res.text();
     try {
-      return text ? JSON.parse(text) : {};
+      return raw ? JSON.parse(raw) : {};
     } catch {
-      return { message: text };
+      return { message: raw };
     }
   }
 
@@ -486,56 +480,70 @@ export default function Profile() {
 
     setSaving(true);
 
-    // Normalización
+    // Normalización de valores actuales y originales
     const name = (formData.name ?? "").trim();
     const surname = (formData.surname ?? "").trim();
     const email = (formData.email ?? "").trim();
     const fullPhoneNumber = getFullPhoneNumber().trim();
     const originalFullPhone = (original.phoneNumber ?? "").trim();
 
-    // Tareas: ojo con las claves que espera tu backend (ajustá si usa firstName/lastName)
-    const tasks = [];
+    // Construimos pasos a ejecutar en SERIE (evita pisadas en el backend)
+    const steps = [];
     if (name !== (original.name ?? "")) {
-      tasks.push({ field: "name", promise: patchJson("/api/user/name", { name }) });
+      steps.push({ field: "name", run: () => patchJson("/api/user/name", { name }) });
     }
     if (surname !== (original.surname ?? "")) {
-      tasks.push({ field: "surname", promise: patchJson("/api/user/surname", { surname }) });
+      steps.push({ field: "surname", run: () => patchJson("/api/user/surname", { surname }) });
     }
     if (email !== (original.email ?? "")) {
-      tasks.push({ field: "email", promise: patchJson("/api/user/email", { email }) });
+      steps.push({ field: "email", run: () => patchJson("/api/user/email", { email }) });
     }
     if (fullPhoneNumber !== originalFullPhone) {
-      tasks.push({ field: "phoneNumber", promise: patchJson("/api/user/phone", { phoneNumber: fullPhoneNumber }) });
+      steps.push({ field: "phoneNumber", run: () => patchJson("/api/user/phone", { phoneNumber: fullPhoneNumber }) });
     }
 
-    if (tasks.length === 0) {
+    if (steps.length === 0) {
       alert("No hay cambios para guardar");
       setSaving(false);
       return;
     }
 
     try {
-      const results = await Promise.allSettled(tasks.map(t => t.promise));
-
       const successfulFields = [];
       const failedFields = [];
 
-      results.forEach((r, i) => {
-        const field = tasks[i].field;
-        if (r.status === "fulfilled") successfulFields.push(field);
-        else failedFields.push({ field, error: r.reason?.message || String(r.reason) });
-      });
+      // Ejecutar cada PATCH en serie
+      for (const step of steps) {
+        try {
+          await step.run();
+          successfulFields.push(step.field);
+        } catch (err) {
+          failedFields.push({ field: step.field, error: err?.message || String(err) });
+        }
+      }
 
-      // ✅ Actualizar SOLO los campos que realmente se guardaron
+      // Actualizar sólo lo que realmente se guardó
       if (successfulFields.length > 0) {
         const newOriginal = { ...original };
         const newUser = user ? { ...user } : user;
 
         for (const f of successfulFields) {
-          if (f === "name") { newOriginal.name = name; if (newUser) newUser.name = name; }
-          if (f === "surname") { newOriginal.surname = surname; if (newUser) newUser.surname = surname; }
-          if (f === "email") { newOriginal.email = email; if (newUser) newUser.email = email; }
-          if (f === "phoneNumber") { newOriginal.phoneNumber = fullPhoneNumber; if (newUser) newUser.phoneNumber = fullPhoneNumber; }
+          if (f === "name") {
+            newOriginal.name = name;
+            if (newUser) newUser.name = name;
+          }
+          if (f === "surname") {
+            newOriginal.surname = surname;
+            if (newUser) newUser.surname = surname;
+          }
+          if (f === "email") {
+            newOriginal.email = email;
+            if (newUser) newUser.email = email;
+          }
+          if (f === "phoneNumber") {
+            newOriginal.phoneNumber = fullPhoneNumber;
+            if (newUser) newUser.phoneNumber = fullPhoneNumber;
+          }
         }
 
         setOriginal(newOriginal);
@@ -545,9 +553,8 @@ export default function Profile() {
       if (failedFields.length === 0) {
         alert("Todos los cambios guardados correctamente");
       } else {
-        console.error("Fallaron:", failedFields);
         const msg = failedFields.map(f => `• ${f.field}: ${f.error}`).join("\n");
-        alert(`${successfulFields.length} de ${tasks.length} cambios guardados.\nFallaron:\n${msg}`);
+        alert(`${successfulFields.length} de ${steps.length} cambios guardados.\nFallaron:\n${msg}`);
       }
     } catch (err) {
       console.error("💥 Error inesperado:", err);
@@ -556,7 +563,6 @@ export default function Profile() {
       setSaving(false);
     }
   };
-
 
   if (loading) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Cargando…</div>;
   if (error) return <div style={{ color: theme.text, padding: 24, fontFamily: theme.font }}>Error: {error}</div>;
@@ -620,7 +626,7 @@ export default function Profile() {
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Ingrese su email"
-                disabled={false}
+                disabled={true}
               />
               <DateField 
                 id="birthdate" 
