@@ -182,7 +182,8 @@ export default function Profile() {
     name: "",
     surname: "",
     email: "",
-    password: "",
+    currentPassword: "",
+    newPassword: "",
     birthdate: "",
     personalIdType: "",
     personalId: "",
@@ -210,7 +211,6 @@ export default function Profile() {
 
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
-  // ========= Función para cargar credenciales =========
   const loadCredentials = async () => {
     const token = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
     try {
@@ -281,12 +281,10 @@ export default function Profile() {
       .then((d) => {
         setUser(d);
         
-        // Extraer código de país y número del teléfono completo
-        let countryCode = "+598"; // Por defecto Uruguay
+        let countryCode = "+598"; 
         let phoneNumber = d.phoneNumber || "";
         
         if (d.phoneNumber) {
-          // Buscar el código de país que coincida
           const matchedCountry = countries.find(country => 
             d.phoneNumber.startsWith(country.code)
           );
@@ -301,7 +299,7 @@ export default function Profile() {
           name: d.name || "",
           surname: d.surname || "",
           email: d.email || "",
-          phoneNumber: d.phoneNumber || "", // Guardar el número completo
+          phoneNumber: d.phoneNumber || "", 
           provider: d.provider || false,
         });
         
@@ -309,6 +307,8 @@ export default function Profile() {
           name: d.name || "",
           surname: d.surname || "",
           email: d.email || "",
+          currentPassword: "",
+          newPassword: "",
           birthdate: d.birthdate || "",
           personalIdType: d.personalIdType || "",
           personalId: d.personalId || "",
@@ -329,7 +329,6 @@ export default function Profile() {
         setLoading(false);
       });
 
-    // Cargar credenciales
     loadCredentials();
   }, []);
 
@@ -348,7 +347,6 @@ export default function Profile() {
     return `${formData.countryCode}${formData.phoneNumber}`;
   };
 
-  // Helper PATCH que relee el token y acepta ApiResponse o AuthResponse
   async function patchJson(path, payload) {
     const liveToken = localStorage.getItem("jwt") || sessionStorage.getItem("jwt");
     const res = await fetch(`${API}${path}`, {
@@ -458,8 +456,8 @@ export default function Profile() {
         throw new Error(errorText || `HTTP ${res.status}`);
       }
 
-      const created = await res.json();                 // ← ahora viene el DTO
-      setCredentials(prev => [...prev, created]);       // ← lo agregás al listado
+      const created = await res.json();                 
+      setCredentials(prev => [...prev, created]);       
 
       setFormData(prev => ({
         ...prev,
@@ -487,14 +485,14 @@ export default function Profile() {
 
     setSaving(true);
 
-    // Normalización de valores actuales y originales
     const name = (formData.name ?? "").trim();
     const surname = (formData.surname ?? "").trim();
     const email = (formData.email ?? "").trim();
+    const currentPassword = (formData.currentPassword ?? ""); 
+    const newPassword = (formData.newPassword ?? "");         
     const fullPhoneNumber = getFullPhoneNumber().trim();
     const originalFullPhone = (original.phoneNumber ?? "").trim();
 
-    // Construimos pasos a ejecutar en SERIE (evita pisadas en el backend)
     const steps = [];
     if (name !== (original.name ?? "")) {
       steps.push({ field: "name", run: () => patchJson("/api/user/name", { name }) });
@@ -505,9 +503,35 @@ export default function Profile() {
     if (email !== (original.email ?? "")) {
       steps.push({ field: "email", run: () => patchJson("/api/user/email", { email }) });
     }
-    if (email !== (original.password ?? "")) {
-      steps.push({ field: "password", run: () => patchJson("/api/user/password", { password }) });
+
+    if (newPassword && newPassword.length > 0) {
+      if (!currentPassword || currentPassword.length === 0) {
+        alert("Por favor ingresa tu contraseña actual para cambiarla");
+        setSaving(false);
+        return;
+      }
+      
+      if (currentPassword === newPassword) {
+        alert("La nueva contraseña debe ser diferente a la actual");
+        setSaving(false);
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        alert("La nueva contraseña debe tener al menos 6 caracteres");
+        setSaving(false);
+        return;
+      }
+      
+      steps.push({
+        field: "password",
+        run: () => patchJson("/api/user/password", {
+          currentPassword: currentPassword, 
+          newPassword: newPassword         
+        }),
+      });
     }
+
     if (fullPhoneNumber !== originalFullPhone) {
       steps.push({ field: "phoneNumber", run: () => patchJson("/api/user/phone", { phoneNumber: fullPhoneNumber }) });
     }
@@ -522,7 +546,6 @@ export default function Profile() {
       const successfulFields = [];
       const failedFields = [];
 
-      // Ejecutar cada PATCH en serie
       for (const step of steps) {
         try {
           await step.run();
@@ -532,7 +555,6 @@ export default function Profile() {
         }
       }
 
-      // Actualizar sólo lo que realmente se guardó
       if (successfulFields.length > 0) {
         const newOriginal = { ...original };
         const newUser = user ? { ...user } : user;
@@ -549,6 +571,13 @@ export default function Profile() {
           if (f === "email") {
             newOriginal.email = email;
             if (newUser) newUser.email = email;
+          }
+          if (f === "password") {
+            setFormData(prev => ({
+              ...prev,
+              currentPassword: "",
+              newPassword: ""
+            }));
           }
           if (f === "phoneNumber") {
             newOriginal.phoneNumber = fullPhoneNumber;
@@ -642,18 +671,26 @@ export default function Profile() {
               </div>
             </div>  
             <div style={styles.gridRow}>
-              <div style={styles.fullWidth}>
-                <InputField
-                id="password"
-                label="Contraseña"
+              <InputField
+                id="currentPassword"
+                label="Contraseña Actual"
                 type="password"
-                value={formData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Ingrese su contraseña"
-                disabled={true}
+                value={formData.currentPassword}
+                onChange={(e) => handleInputChange("currentPassword", e.target.value)}
+                placeholder="Ingresa tu contraseña actual"
+                disabled={false}
               />
-              </div>
+              <InputField
+                id="newPassword"
+                label="Nueva Contraseña"
+                type="password"
+                value={formData.newPassword}
+                onChange={(e) => handleInputChange("newPassword", e.target.value)}
+                placeholder="Ingresa tu nueva contraseña"
+                disabled={false}
+              />
             </div>
+            
             <div style={styles.gridRow}>
               <DateField 
                 id="birthdate" 
@@ -668,8 +705,8 @@ export default function Profile() {
                 value={String(user.provider ? true : formData.provider)}
                 onChange={(e) => handleProviderChange(e.target.value === "true")}
                 options={[
-                  { value: false, label: "No" },
-                  { value: true, label: "Sí" },
+                  { value: "false", label: "No" },
+                  { value: "true", label: "Sí" },
                 ]}
                 disabled={user.provider}
               />
@@ -774,8 +811,7 @@ export default function Profile() {
                         alignItems: "center",
                         justifyContent: "center",
                       }}
-                    >
-                      📜
+                    >                
                     </div>
                   </div>
 
@@ -885,6 +921,16 @@ export default function Profile() {
             </SubmitButton>
           </form>
         </Card>
+        {/* Card de agregar servicios - solo para proveedores*/}
+        {user?.provider && (
+          <Card>
+            <div style={styles.sectionTitle}>Servicio profesional</div>            
+              <SubmitButton
+                onClick={() => navigate("/service_post2")}
+              >Agregar Servicios
+              </SubmitButton>          
+          </Card>
+        )}
       </div>
     </div>
   );

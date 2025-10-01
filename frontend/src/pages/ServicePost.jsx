@@ -343,7 +343,7 @@ export default function ServicePost() {
     const payload = toBackendPayload(form, photoUrls);
     try {
       await createServicePost(payload);
-      navigate("/services/mine");
+      navigate("/home_page");
     } catch (err) {
       console.error("Error al publicar servicio:", err);
       // TODO: mapear errores del backend a campos como en Register.jsx
