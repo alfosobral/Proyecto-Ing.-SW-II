@@ -69,7 +69,7 @@ export default function Navbar() {
                 Mis credenciales
               </button>
               <button onClick={handleLogout} style={{ ...styles.sideLink, textAlign: "left", background: "none", border: "none" }}>
-                Cerrar sesi\u00f3n
+                Cerrar sesión
               </button>
             </aside>
           </>
