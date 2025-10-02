@@ -80,6 +80,12 @@ export default function LogIn() {
       }
 
       console.log("JSON completo del backend:", data);
+      
+      // Guardar token en localStorage para usarlo en otras partes
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('userEmail', data.email);
+      console.log('✅ Token guardado en localStorage:', data.token.substring(0, 50) + '...');
+      
       authLogin({ token: data.token, email: data.email, remember: form.remember });
       navigate("/home_page");
     } catch (err) {

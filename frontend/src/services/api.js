@@ -19,6 +19,8 @@ let authTokenProvider = () => {
   if (typeof window === "undefined") return null;
   try {
     return (
+      localStorage.getItem("authToken") ||      // ← Tu login usa este
+      sessionStorage.getItem("authToken") ||
       sessionStorage.getItem("auth_token") ||
       localStorage.getItem("auth_token") ||
       sessionStorage.getItem("jwt") ||

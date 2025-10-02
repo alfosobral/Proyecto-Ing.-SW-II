@@ -141,8 +141,18 @@ export default function ServicePost() {
       ? { weeklySlots: true }
       : {};
     setTouched((t) => ({ ...t, ...localTouched }));
-    if (canGoNext(step)) setStep((s) => Math.min(2, s + 1));
+    if (canGoNext(step)) {
+      console.log('➡️ Avanzando del paso', step, 'al paso', step + 1);
+      setStep((s) => Math.min(2, s + 1));
+    }
   };
+  
+  const handleNextClick = (e) => {
+    e.preventDefault(); // Prevenir cualquier envío del form
+    e.stopPropagation(); // Evitar propagación del evento
+    next();
+  };
+  
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   // ======== Opciones dinámicas de horarios según duración ========
@@ -190,6 +200,13 @@ export default function ServicePost() {
 
   async function onSubmit(e) {
     e.preventDefault();
+    
+    // VALIDACIÓN CRÍTICA: Solo permitir envío en el paso final
+    if (step !== 2) {
+      console.log('🚫 Intento de envío bloqueado. Paso actual:', step, 'Requerido: 2');
+      return;
+    }
+    
     setSubmitted(true);
 
     if (!isValid) {
@@ -199,24 +216,52 @@ export default function ServicePost() {
         title: true, description: true, xMinutes: true, rate: true, validUntil: true,
         weeklySlots: true, department: true, city: true, street: true, doorNumber: true, postalCode: true,
       }));
-      // si está en pasos previos, no dejamos enviar
-      if (step !== 2) return;
+      console.log('❌ Formulario inválido, no se puede enviar');
+      return;
     }
+
+    console.log('✅ Iniciando envío del servicio desde paso:', step);
 
     setLoading(true);
     setServerErrors({});
 
     try {
-      const photoUrls = await uploadPortfolioFiles(form.portfolio);
-      const payload = toBackendPayload(form, photoUrls);
+      const payload = toBackendPayload(form); // Sin URLs de fotos previas
+      const API = import.meta.env.VITE_API_URL || "http://localhost:8080";
+      const endpoint = `${API}/api/service-post`;
 
-      const API = import.meta.env.VITE_API_URL;
-      const endpoint = `${API}/api/service-posts`;
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('❌ Token no encontrado en localStorage');
+        alert('Por favor, inicia sesión nuevamente');
+        navigate('/login');
+        return;
+      }
+
+      console.log('✅ Token encontrado:', token.substring(0, 50) + '...');
+      console.log('📦 Payload a enviar:', payload);
+
+      // Crear FormData para multipart
+      const formData = new FormData();
+      formData.append('servicePost', new Blob([JSON.stringify(payload)], {
+        type: 'application/json'
+      }));
+
+      // Agregar fotos si existen
+      if (form.portfolio && form.portfolio.length > 0) {
+        console.log('📸 Agregando fotos al FormData:', form.portfolio.length, 'archivos');
+        form.portfolio.forEach(file => {
+          formData.append('photos', file);
+        });
+      }
 
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: { 
+          "Authorization": `Bearer ${token}`
+          // NO incluir Content-Type para FormData - se establece automáticamente
+        },
+        body: formData,
       });
 
       if (!res.ok) {
@@ -230,8 +275,10 @@ export default function ServicePost() {
         throw new Error(data?.message || text || `Error ${res.status}`);
       }
 
-      await res.json().catch(() => null);
-      navigate("/services/mine");
+      const servicePostData = await res.json();
+      console.log('✅ Service post creado exitosamente:', servicePostData);
+
+      navigate("/home_page");
     } catch (err) {
       console.error("Error al publicar servicio:", err);
     } finally {
@@ -435,7 +482,7 @@ export default function ServicePost() {
               <button type="button" onClick={back} style={secondaryBtn}>Atrás</button>
             )}
             {step < 2 ? (
-              <button type="button" onClick={next} style={primaryBtn(!canGoNext(step))} disabled={!canGoNext(step)}>
+              <button type="button" onClick={handleNextClick} style={primaryBtn(!canGoNext(step))} disabled={!canGoNext(step)}>
                 Siguiente
               </button>
             ) : (
@@ -523,7 +570,7 @@ function mapBackendErrorsToFields(data) {
   return mapped;
 }
 
-function toBackendPayload(form, photoUrls = []) {
+function toBackendPayload(form) {
   const normalizedSlots = Object.fromEntries(
     Object.entries(form.weeklySlots || {}).map(([key, hours]) => [
       key,
@@ -537,9 +584,8 @@ function toBackendPayload(form, photoUrls = []) {
     title: form.title.trim(),
     description: form.description.trim(),
     price: Number(form.rate || 0),
-    durationInMinutes: Number(form.xMinutes || 0),
+    duration: Number(form.xMinutes || 0),
     availableDates: buildAvailableDates(normalizedSlots, form.validUntil, Number(form.xMinutes || 0)),
-    photosURLs: Array.isArray(photoUrls) ? photoUrls : [],
     location: form.addLocation ? normalizeLocationForBackend(form.location) : null,
   };
 }
@@ -598,8 +644,6 @@ function normalizeLocationForBackend(rawLocation) {
 
 function blankToNull(value) { if (typeof value !== "string") return null; const t = value.trim(); return t.length > 0 ? t : null; }
 function numberOrNull(value) { if (value === undefined || value === null || value === "") return null; const n = Number(value); return Number.isFinite(n) ? n : null; }
-
-async function uploadPortfolioFiles(files) { return []; }
 
 // ================== Animaciones de slides ==================
 const stepVariants = {

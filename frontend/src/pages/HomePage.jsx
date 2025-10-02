@@ -28,8 +28,8 @@ function formatPrice(price) {
 
 export default function HomePage() {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["servicePosts", { page: 0, size: 12 }],
-    queryFn: () => listServicePosts({ page: 0, size: 12 }),
+    queryKey: ["servicePosts", { page: 1, size: 12 }],
+    queryFn: () => listServicePosts({ page: 1, size: 12 }),
   });
 
   const posts = data?.content ?? [];
