@@ -180,7 +180,7 @@ export default function MultiSelectField({
                     fontSize: 12,
                     padding: "2px 8px",
                     borderRadius: 999,
-                    border: "1px solid rgba(255,255,255,.25)",
+                    border: "2px solid rgba(255,255,255,.25)",
                     background: "rgba(255,255,255,.08)",
                     color: "#fff",
                     cursor: "pointer",

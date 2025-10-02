@@ -36,8 +36,8 @@ export default function Navbar() {
         }}
         aria-hidden={!menuOpen}
       >
-        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categor\u00edas</a>
-        <a href="/service_post" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
+        <a href="/" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Categorías</a>
+        <a href="/service_post2" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Servicios</a>
         <a href="/contacto" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Contacto</a>
         <a href="/calendar" style={styles.sideLink} onClick={() => setMenuOpen(false)}>Mi calendario</a>
       </aside>

@@ -309,7 +309,7 @@ export default function Register({ width = 420 }) {
           />
 
           <div style={{ margin: "18px 0 8px 0", textAlign: "center" }}>
-            <span style={{ color: "#bababaff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
+            <span style={{ color: "#ffffffff", fontSize: 15 }}>¿Ya tienes cuenta? </span>
             <a
               href="#"
               style={{ color: "#34aadcff", textDecoration: "underline", cursor: "pointer", fontWeight: 600 }}
@@ -423,7 +423,7 @@ const styles = {
   title: { margin: 0, marginTop: 20, marginBottom: 20, fontSize: 26, color: "#ffffffff", textAlign: "center"},
   meterWrap: { height: 6, background: "#e2e8f0", borderRadius: 999, marginTop: 6 },
   meterBar: { height: "100%", background: "#42b3fd", borderRadius: 999, transition: "width .25s" },
-  meterText: { color: "#677384ff", fontSize: 12, display: "block", marginTop: 6 },
+  meterText: { color: "#ffffff", fontSize: 12, display: "block", marginTop: 6, marginBottom: 6 },
 };
 
 const buttonStyle = disabled => ({

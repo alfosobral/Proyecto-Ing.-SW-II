@@ -334,7 +334,7 @@ export default function SelectField({
               width: 18,
               height: 18,
               lineHeight: 0,                    // evita desplazamientos por métricas de fuente
-              color: "#1f2937",
+              color: "#7f7d7dff",
               pointerEvents: "none",
           }}
         >

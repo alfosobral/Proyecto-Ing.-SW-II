@@ -75,7 +75,7 @@ export default function PasswordField({
             transform: "translateY(-50%)",
             background: "none",
             border: "none",
-            color: "#ffffffff",
+            color: "#7f7d7dff",
             cursor: "pointer",
             fontSize: 20,
             padding: 0,
